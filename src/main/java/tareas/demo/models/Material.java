@@ -3,8 +3,10 @@ package tareas.demo.models;
 import jakarta.persistence.*;
 import java.util.*;
 import lombok.Data;
+import tareas.demo.config.AuditoriaListener;
 
 @Entity
+@EntityListeners(AuditoriaListener.class)
 @Data
 @Table(name = "materiales")
 public class Material {

@@ -2,11 +2,12 @@ package tareas.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import java.time.LocalDate;
 import java.util.*;
 import lombok.Data;
+import tareas.demo.config.AuditoriaListener;
 
 @Entity
+@EntityListeners(AuditoriaListener.class)
 @Data
 @Table(name = "recursosMultimedia")
 public class RecursosMultimedia {

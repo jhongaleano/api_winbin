@@ -2,10 +2,14 @@ package tareas.demo.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import tareas.demo.config.AuditoriaListener;
 
 @Entity
+@EntityListeners(AuditoriaListener.class)
 @Data
 @Table(name = "categoriaPuntaje")
+
+
 public class CategoriaPuntaje {
 
     @Id
