@@ -1,7 +1,9 @@
 package tareas.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.*;
 import lombok.Data;
 
 @Entity
@@ -27,4 +29,8 @@ public class RecursosMultimedia {
 
     @Column(name = "estado")
     private String estado;
+
+    @ManyToMany(mappedBy = "recursosMultimedia")
+    @JsonIgnoreProperties("recursosMultimedia")
+    private List<Material> material;
 }
