@@ -3,8 +3,10 @@ package tareas.demo.models;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
+import tareas.demo.config.AuditoriaListener;
 
 @Entity
+@EntityListeners(AuditoriaListener.class)
 @Data
 @Table(name = "detalleSession")
 public class DetalleSession {
