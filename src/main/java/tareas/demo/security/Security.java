@@ -13,27 +13,37 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class Security {
 
-
-
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+        AuthenticationConfiguration config
+    ) throws Exception {
         return config.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("Estudiante", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(httpBasic -> {});
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+        throws Exception {
+        http.csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth ->
+                auth
+                    .requestMatchers("/error")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/usuarios/registro")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/**")
+                    .hasAnyRole("Estudiante", "ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PATCH, "/api/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/**")
+                    .hasRole("ADMIN")
+                    .anyRequest()
+                    .authenticated()
+            )
+            .httpBasic(httpBasic -> {});
 
         return http.build();
     }
