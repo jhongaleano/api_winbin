@@ -6,8 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import tareas.demo.services.UsuarioService;
 
@@ -35,5 +33,26 @@ public class usuarioController {
             return ResponseEntity.badRequest().body("Error al registrar: " + e.getMessage());
         }
     }
+
+     @PutMapping("/{documento}")
+    public usuarios actualizar(@PathVariable String documento, @RequestBody usuarios usuarioActualizado) {
+        return repositorio.findById(documento)
+                .map(usuario -> {
+                    usuario.setDocumento(usuarioActualizado.getDocumento());
+                    return repositorio.save(usuario);
+                })
+                .orElseThrow(() -> new RuntimeException("No se pudo actualizar, ID no existe"));
+    }
+
+    @DeleteMapping("/{documento}")
+    public ResponseEntity<?> eliminar(@PathVariable String documento){
+        try {
+            repositorio.deleteByDocumento(documento);
+            return ResponseEntity.ok("Usuario eliminado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al eliminar: " + e.getMessage());
+        }
+    }
+
     
 }

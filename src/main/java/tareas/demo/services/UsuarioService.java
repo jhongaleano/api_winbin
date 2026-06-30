@@ -22,4 +22,8 @@ public class UsuarioService {
 
         return usuarioRepository.save(usuario);
     }
+
+    public void eliminarUsuario(String documento){
+        usuarioRepository.deleteByDocumento(documento);
+    }
 }
