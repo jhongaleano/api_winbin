@@ -16,7 +16,7 @@ import tareas.demo.config.AuditoriaListener;
 public class usuarios {
     @Id
     @Column(name = "documento")
-    private Integer documento;
+    private String documento;
 
     @Column(name = "nombre")
     private String nombre;
