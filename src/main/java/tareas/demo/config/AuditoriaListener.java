@@ -10,14 +10,16 @@ import java.time.LocalDateTime;
 @Component
 public class AuditoriaListener {
 
-    private static AuditoriaRepository auditoriaRepository;
+    // Cambiar el atributo estático al servicio
+private static tareas.demo.services.AuditoriaService auditoriaService;
 
-    @Autowired
-    public void init(AuditoriaRepository repository) {
-        AuditoriaListener.auditoriaRepository = repository;
-    }
+@Autowired
+public void init(tareas.demo.services.AuditoriaService service) {
+    AuditoriaListener.auditoriaService = service;
+}
 
-    @PostPersist
+
+@PostPersist
     public void trasInsertar(Object entity) {
         registrarAccion("INSERT", entity);
     }
@@ -32,13 +34,15 @@ public class AuditoriaListener {
         registrarAccion("DELETE", entity);
     }
 
-    private void registrarAccion(String accion, Object entity) {
-        Auditoria aud = new Auditoria();
-        aud.setAccion(accion);
-        aud.setTablaAfectada(entity.getClass().getSimpleName().toLowerCase());
-        aud.setFecha(LocalDateTime.now());
-        aud.setValorActual(entity.toString());
-        
-        auditoriaRepository.save(aud);
-    }
+    
+private void registrarAccion(String accion, Object entity) {
+    Auditoria aud = new Auditoria();
+    aud.setAccion(accion);
+    aud.setTablaAfectada(entity.getClass().getSimpleName().toLowerCase());
+    aud.setFecha(LocalDateTime.now());
+    aud.setValorActual(entity.toString());
+
+    // Usar el servicio con transacción independiente
+    auditoriaService.guardarAuditoria(aud);
+}
 }
