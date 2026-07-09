@@ -1,8 +1,7 @@
 package tareas.demo.controller;
 
 import tareas.demo.models.Material;
-import tareas.demo.repository.winbin;
-import org.springframework.beans.factory.annotation.Autowired;
+import tareas.demo.repository.MaterialRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -13,8 +12,12 @@ import java.util.List;
 
 public class MaterialController {
 
-    @Autowired
-    private winbin repositorio ;
+
+    private final MaterialRepository repositorio ;
+
+    public MaterialController(MaterialRepository repository) {
+        this.repositorio = repository;
+    }
 
     @GetMapping
     public List<Material> listar(){

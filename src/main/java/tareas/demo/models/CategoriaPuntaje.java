@@ -10,8 +10,7 @@ import tareas.demo.config.AuditoriaListener;
 @Table(name = "categoriaPuntaje")
 
 
-public class CategoriaPuntaje {
-
+public class CategoriaPuntaje{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_categoria;
