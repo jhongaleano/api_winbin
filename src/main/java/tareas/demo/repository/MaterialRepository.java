@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import tareas.demo.models.Material;
 
 
-public interface winbin extends JpaRepository<Material, Integer>{
+public interface MaterialRepository  extends JpaRepository<Material, Integer>{
     
 }

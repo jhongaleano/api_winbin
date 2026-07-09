@@ -16,20 +16,22 @@ import tareas.demo.services.UsuarioService;
 @RestController
 @RequestMapping("/api/usuarios")
 public class usuarioController {
+ 
+    private  final UsuarioRepository repositorio;
+    private  final UsuarioService usuarioService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UsuarioRepository repositorio;
+    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService) {
+        this.repositorio = repositorio;
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public List<usuarios> listar() {
         return repositorio.findAll();
     }
+    
 
-    @Autowired
-    private UsuarioService usuarioService;
+    
 
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody usuarios nuevoUsuario) {

@@ -17,18 +17,30 @@ public class RegistroIa {
     @Column(name = "id_ia")
     private Integer idIa ;
 
-    @Column(name = "confianza", precision = 10, scale = 0)
+    @Column(name = "confianza")
     private Double confianza;
 
     @Column(name = "utl_imagen", length = 100)
     private String utlImagen;
 
+   
+
+    @Transient private Integer idSession;
+    @Transient private Integer idMaterial;
+    @Transient private Integer idCategoria;
+
+
     @ManyToOne
     @JoinColumn(name = "id_session", nullable = false)
-    private DetalleSession IdSession;
+    private DetalleSession session; 
 
     @ManyToOne
     @JoinColumn(name = "id_material", nullable = false)
     private Material material;
+
+    @ManyToOne
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private CategoriaPuntaje categoria;
+
 
 }
