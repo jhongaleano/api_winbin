@@ -1,22 +1,18 @@
 package tareas.demo.controller;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.models.usuarios;
-import tareas.demo.payload.LoginRequest;
 import tareas.demo.repository.UsuarioRepository;
 import tareas.demo.services.UsuarioService;
+import org.springframework.security.core.Authentication;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class usuarioController {
- 
+
     private  final UsuarioRepository repositorio;
     private  final UsuarioService usuarioService;
 
@@ -29,8 +25,39 @@ public class usuarioController {
     public List<usuarios> listar() {
         return repositorio.findAll();
     }
-    
 
+    @GetMapping("/inactivos")
+    public ResponseEntity<List<usuarios>> listarInactivos() {
+        return ResponseEntity.ok(usuarioService.listarUsuariosInactivos());
+    }
+
+    @GetMapping("/todos")
+    public ResponseEntity<List<usuarios>> listarTodosInactivosYActivos() {
+        return ResponseEntity.ok(usuarioService.listarTodosIncluyendoInactivos());
+    }
+
+    @GetMapping("/perfil")
+    public ResponseEntity<?> obtenerMiPerfil(Authentication authentication) {
+        try {
+            String documentoUsuarioLogueado = authentication.getName(); 
+            
+            usuarios perfil = usuarioService.obtenerPerfil(documentoUsuarioLogueado);
+            return ResponseEntity.ok(perfil);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al obtener el perfil: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{documento}")
+    public ResponseEntity<?> obtenerUsuarioPorDocumento(@PathVariable String documento) {
+        try {
+            usuarios usuario = usuarioService.obtenerPerfil(documento);
+            return ResponseEntity.ok(usuario);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Usuario no encontrado: " + e.getMessage());
+        }
+    }
     
 
     @PostMapping("/registro")
@@ -48,26 +75,63 @@ public class usuarioController {
     }
 
     @PutMapping("/{documento}")
-    public usuarios actualizar(
+    public ResponseEntity<?> actualizar(
         @PathVariable String documento,
         @RequestBody usuarios usuarioActualizado
     ) {
-        return repositorio
-            .findById(documento)
+        try{
+            usuarios usuarioModificado = repositorio.findById(documento)
             .map(usuario -> {
-                usuario.setDocumento(usuarioActualizado.getDocumento());
+                usuario.setNombre(usuarioActualizado.getNombre());
+                usuario.setCurso(usuarioActualizado.getCurso());
                 return repositorio.save(usuario);
             })
-            .orElseThrow(() ->
-                new RuntimeException("No se pudo actualizar, ID no existe")
+            .orElseThrow(() -> 
+                new RuntimeException("El usuario con documento " + documento + " no existe")
             );
+            return ResponseEntity.ok(usuarioModificado);
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                "Error al actualizar: " + e.getMessage()
+            );
+        }
     }
+    
+    @PutMapping("/{documento}/rol")
+    public ResponseEntity<?> cambiarRol(
+            @PathVariable String documento,
+            @RequestBody Map<String, String> requestBody
+    ) {
+        try {
+            String nuevoRol = requestBody.get("rol");
+            if (nuevoRol == null || nuevoRol.isBlank()) {
+                return ResponseEntity.badRequest().body("El campo 'rol' es obligatorio.");
+            }
+
+            usuarios usuarioActualizado = usuarioService.cambiarRolUsuario(documento, nuevoRol);
+            return ResponseEntity.ok(usuarioActualizado);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al actualizar rol: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{documento}/reactivar")
+    public ResponseEntity<?> reactivarUsuario(@PathVariable String documento) {
+        try {
+            usuarios usuarioReactivado = usuarioService.reactivarUsuario(documento);
+            return ResponseEntity.ok(usuarioReactivado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al reactivar usuario: " + e.getMessage());
+        }
+    }
+
 
     @DeleteMapping("/{documento}")
     public ResponseEntity<?> eliminar(@PathVariable String documento) {
         try {
-            repositorio.deleteByDocumento(documento);
-            return ResponseEntity.ok("Usuario eliminado correctamente");
+            usuarioService.eliminarUsuario(documento);
+            return ResponseEntity.ok("Usuario eliminado/desactivado correctamente");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
                 "Error al eliminar: " + e.getMessage()
@@ -75,18 +139,4 @@ public class usuarioController {
         }
     }
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // Spring Security usará internamente tu CustomUserDetailsService aquí:
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getDocumento(), // <--- Aquí va el documento
-                loginRequest.getContrasenna()
-            )
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        // Retornas tu token JWT o mensaje de éxito
-        return ResponseEntity.ok("Login exitoso");
-    }
 }

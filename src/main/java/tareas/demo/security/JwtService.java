@@ -2,32 +2,45 @@ package tareas.demo.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor("ClaveSecretaSuperSeguraParaWinBin2026_JWT_Key!".getBytes());
+    private final Key secretKey;
+    private final long expirationTime;
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 2;
+    public JwtService(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") long expirationTime) 
+            {
+                this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                this.expirationTime = expirationTime;
+            }
 
     public String generarToken(String documento, String rol) {
+        String rolFormateado = rol.startsWith("ROLE_") ? rol : "ROLE_" + rol;
         return Jwts.builder()
                 .setSubject(documento)
-                .claim("role", rol)
+                .claim("role", rolFormateado)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(secretKey)
                 .compact();
     }
 
     public String obtenerDocumento(String token) {
         return obtenerClaims(token).getSubject();
+    }
+
+    public String obtenerRol(String token) {
+        return obtenerClaims(token).get("role", String.class);
     }
 
     public boolean esTokenValido(String token) {
@@ -40,7 +53,7 @@ public class JwtService {
 
     private Claims obtenerClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -1,5 +1,6 @@
 package tareas.demo.security;
 
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,18 +24,22 @@ public class CustomUserDetailsService implements UserDetailsService {
         usuarios u = usuarioRepository.findByDocumento(documento)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
+        if (Boolean.FALSE.equals(u.getActivo())) {
+            throw new DisabledException("La cuenta del usuario ha sido desactivada.");
+        }
+
         if (u.getContrasenna() == null || u.getContrasenna().isBlank()) {
             throw new UsernameNotFoundException("Usuario sin contraseña configurada");
         }
 
-        // En BD: ESTUDIANTE, ADMIN — Spring usa ROLE_* para hasRole(...)
-        String rol = u.getRol() != null ? u.getRol().trim().toUpperCase() : "Estudiante";
-        String authority = rol.startsWith("ROLE_") ? rol : "ROLE_" + rol;
+        String rolLimpio = (u.getRol() != null && !u.getRol().isBlank()) ? u.getRol().trim().toUpperCase() : "USER";
+        String authority = rolLimpio.startsWith("ROLE_") ? rolLimpio : "ROLE_" + rolLimpio;
 
         return User.builder()
-                .username(String.valueOf(u.getDocumento()))
+                .username(u.getDocumento())
                 .password(u.getContrasenna())
-                .authorities(authority)
-                .build();
+                .disabled(!Boolean.TRUE.equals(u.getActivo()))
+                .roles(authority)
+                .build();   
     }
 }
