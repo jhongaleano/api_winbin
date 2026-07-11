@@ -23,7 +23,6 @@ public class RegistroIa {
     @Column(name = "utl_imagen", length = 100)
     private String utlImagen;
 
-   
 
     @Transient private Integer idSession;
     @Transient private Integer idMaterial;

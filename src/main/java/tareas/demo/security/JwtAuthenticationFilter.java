@@ -32,18 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-        final String token;
-        final String documento;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        token = authHeader.substring(7);
+        final String token = authHeader.substring(7);
 
         try {
-            documento = jwtService.obtenerDocumento(token);
+            final String documento = jwtService.obtenerDocumento(token);
 
             if (documento != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(documento);
@@ -59,7 +57,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error procesando JWT: " + e.getMessage());
+            SecurityContextHolder.clearContext();
+            logger.error("Error al procesar la autenticación con JWT: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
