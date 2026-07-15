@@ -12,8 +12,11 @@ import tareas.demo.repository.AuditoriaRepository;
 @RequestMapping("/api/auditoria")
 
 public class AuditoriaController {
-    @Autowired
-    private AuditoriaRepository repositorio;
+    private final AuditoriaRepository repositorio;
+
+    public AuditoriaController(AuditoriaRepository repositorio){
+        this.repositorio = repositorio;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")

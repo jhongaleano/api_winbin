@@ -18,9 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
-    
+
     @Override
-    public UserDetails loadUserByUsername(String documento) throws UsernameNotFoundException { 
+    public UserDetails loadUserByUsername(String documento) throws UsernameNotFoundException {
         usuarios u = usuarioRepository.findByDocumento(documento)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
@@ -33,13 +33,15 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         String rolLimpio = (u.getRol() != null && !u.getRol().isBlank()) ? u.getRol().trim().toUpperCase() : "USER";
-        String authority = rolLimpio.startsWith("ROLE_") ? rolLimpio : "ROLE_" + rolLimpio;
+        if (rolLimpio.startsWith("ROLE_")) {
+            rolLimpio = rolLimpio.substring(5); // Remueve "ROLE_" de la cadena
+        }
 
         return User.builder()
                 .username(u.getDocumento())
                 .password(u.getContrasenna())
                 .disabled(!Boolean.TRUE.equals(u.getActivo()))
-                .roles(authority)
-                .build();   
-    }
+                .roles(rolLimpio)
+                .build();
+    } 
 }
