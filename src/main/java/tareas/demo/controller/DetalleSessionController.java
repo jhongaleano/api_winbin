@@ -1,7 +1,8 @@
 package tareas.demo.controller;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.UUID;
+
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.models.DetalleSession;
 import tareas.demo.repository.DetalleSessionRepository;
@@ -11,8 +12,11 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/api/DetalleSession")
 public class DetalleSessionController {
 
-    @Autowired
-    private DetalleSessionRepository repositorio;
+    private final DetalleSessionRepository repositorio;
+    
+    public DetalleSessionController(DetalleSessionRepository repositorio){
+        this.repositorio = repositorio;
+    }
 
     @GetMapping
     public List<DetalleSession> listar() {
@@ -25,7 +29,7 @@ public class DetalleSessionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
+    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
         if (!repositorio.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -34,7 +38,7 @@ public class DetalleSessionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DetalleSession> actualizar(@PathVariable Integer id, @RequestBody DetalleSession cambios) {
+    public ResponseEntity<DetalleSession> actualizar(@PathVariable UUID id, @RequestBody DetalleSession cambios) {
         return repositorio.findById(id).map(existente -> {
             existente.setFechaHora(cambios.getFechaHora());
             existente.setDocumento(cambios.getDocumento());

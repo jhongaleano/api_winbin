@@ -21,20 +21,20 @@ import tareas.demo.config.AuditoriaListener;
 @SQLRestriction("activo = true")
 public class usuarios {
     @Id
-    @Column(name = "documento")
+    @Column(name = "documento", nullable = false)
     private String documento;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
     @Column(name = "rol", nullable = false)
     private String rol = "ROLE_USER";
 
     @ManyToOne
-    @JoinColumn(name = "id_curso", nullable = true)
+    @JoinColumn(name = "id_curso", nullable = false)
     private Cursos curso;
 
-    @Column(name = "contrasenna",nullable = true)
+    @Column(name = "contrasenna",nullable = false)
     private String contrasenna;
 
     @Column(name = "puntos", nullable = false)
@@ -42,6 +42,9 @@ public class usuarios {
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = true;
+
+    @Column(name = "avatar_url", nullable = true)
+    private String avatarUrl;
 
     @PrePersist
     public void prePersist() {

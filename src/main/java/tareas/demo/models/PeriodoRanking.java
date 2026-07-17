@@ -1,12 +1,6 @@
 package tareas.demo.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import lombok.Data;
 import tareas.demo.config.AuditoriaListener;
@@ -18,8 +12,8 @@ import tareas.demo.config.AuditoriaListener;
 public class PeriodoRanking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_periodo;
+    @Column(name = "id_periodo",length = 30)
+    private String id_periodo;
 
     @Column(name = "nombre_periodo")
     private String nombrePeriodo;
@@ -32,4 +26,15 @@ public class PeriodoRanking {
 
     @Column(name = "activo")
     private Boolean activo;
+
+    @PrePersist
+    public void generarIdUnico() {
+        if (this.id_periodo == null || this.id_periodo.trim().isEmpty()) {
+            LocalDate fechaReferencia = (this.fechaInicio != null) ? this.fechaInicio : LocalDate.now();
+            int anio = fechaReferencia.getYear();
+            String mes = String.format("%02d", fechaReferencia.getMonthValue());
+            int aleatorio = (int) (Math.random() * 900000) + 100000;
+            this.id_periodo = "PER-" + anio + "-" + mes + "-" + aleatorio;
+        }
+    }
 }

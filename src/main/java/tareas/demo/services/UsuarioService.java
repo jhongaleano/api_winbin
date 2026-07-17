@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
+
 
 import java.util.List;
 @Service
@@ -87,5 +89,15 @@ public class UsuarioService {
 
     public List<usuarios> listarTodosIncluyendoInactivos() {
         return usuarioRepository.findAllIncluyendoInactivos();
+    }
+
+
+    @Transactional
+    public void actualizarAvatar(String documento, String nuevaUrl) {
+        usuarios usuario = usuarioRepository.findByDocumento(documento)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setAvatarUrl(nuevaUrl);
+        usuarioRepository.save(usuario); // Todo se guardará y la auditoría se disparará en el COMMIT único
     }
 }

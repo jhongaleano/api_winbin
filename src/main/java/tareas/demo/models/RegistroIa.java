@@ -2,7 +2,7 @@ package tareas.demo.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.util.UUID;
 import tareas.demo.config.AuditoriaListener;
 
 @Entity
@@ -24,7 +24,7 @@ public class RegistroIa {
     private String utlImagen;
 
 
-    @Transient private Integer idSession;
+    @Transient private UUID idSession;
     @Transient private Integer idMaterial;
     @Transient private Integer idCategoria;
 
