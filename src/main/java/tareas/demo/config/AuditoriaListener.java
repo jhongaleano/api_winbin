@@ -3,24 +3,25 @@ package tareas.demo.config;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import tareas.demo.models.Auditoria;
-import tareas.demo.models.usuarios; 
+import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
+
 
 @Component
 public class AuditoriaListener {
 
-    private static tareas.demo.services.AuditoriaService auditoriaService;
-    private static UsuarioRepository usuarioRepository;
+    private static ApplicationEventPublisher eventPublisher;
+
 
     @Autowired
-    public void init(tareas.demo.services.AuditoriaService service, UsuarioRepository usuarioRepository) {
-        AuditoriaListener.auditoriaService = service;
-        AuditoriaListener.usuarioRepository = usuarioRepository;
+    public void init(ApplicationEventPublisher publisher) {
+        AuditoriaListener.eventPublisher = publisher;
     }
 
     @PostPersist
@@ -49,6 +50,7 @@ public class AuditoriaListener {
         aud.setTablaAfectada(entity.getClass().getSimpleName().toLowerCase());
         aud.setFecha(LocalDateTime.now());
         aud.setValorActual(entity.toString());
+
         String documentoUsuario = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -63,13 +65,16 @@ public class AuditoriaListener {
             }
         }
 
-      if (documentoUsuario != null) {
-            usuarios usuarioAsociado = usuarioRepository.findByDocumento(documentoUsuario).orElse(null);
-            aud.setDocumento(usuarioAsociado); 
-        } else {
+    if (documentoUsuario != null) {
+            usuarios usuarioAsociado = new usuarios();
+            usuarioAsociado.setDocumento(documentoUsuario); 
+            aud.setDocumento(usuarioAsociado);
+    } else {
             aud.setDocumento(null); 
-        }
+    }
 
-        auditoriaService.guardarAuditoria(aud);
+    if (eventPublisher != null) {
+            eventPublisher.publishEvent(new AuditoriaEvent(aud, documentoUsuario));
+        }
     }
 }

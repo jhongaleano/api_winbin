@@ -36,7 +36,7 @@ public class usuarioController {
         return ResponseEntity.ok(usuarioService.listarTodosIncluyendoInactivos());
     }
 
-    @GetMapping("/perfil")
+    @GetMapping("/sr")
     public ResponseEntity<?> obtenerMiPerfil(Authentication authentication) {
         try {
             String documentoUsuarioLogueado = authentication.getName(); 
@@ -56,6 +56,34 @@ public class usuarioController {
             return ResponseEntity.ok(usuario);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Usuario no encontrado: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/avatar")
+    public ResponseEntity<?> actualizarAvatar(
+        @RequestBody Map<String, String> body,
+        Authentication authentication
+    ) {
+        try {
+
+            String documento = authentication.getName(); 
+        
+            String nuevaUrl = body.get("avatarUrl");
+
+            if (nuevaUrl == null || nuevaUrl.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("El campo 'avatarUrl' es obligatorio.");
+            }
+
+            usuarioService.actualizarAvatar(documento, nuevaUrl);
+            
+
+            return ResponseEntity.ok(Map.of(
+            "mensaje", "Avatar actualizado con éxito",
+            "avatarUrl", nuevaUrl
+        ));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al actualizar avatar: " + e.getMessage());
         }
     }
     

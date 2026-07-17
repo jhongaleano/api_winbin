@@ -1,7 +1,12 @@
 package tareas.demo.models;
-
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
+
 import lombok.Data;
 import tareas.demo.config.AuditoriaListener;
 
@@ -12,21 +17,30 @@ import tareas.demo.config.AuditoriaListener;
 public class DetalleSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_session;
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "id_session", length = 36)
+    private UUID id_session;
 
-    @Column(name = "fecha_hora")
+    @Column(name = "fecha_hora",nullable = false)
     private LocalDateTime fechaHora;
 
     @ManyToOne
-    @JoinColumn(name = "documento")
+    @JoinColumn(name = "documento",nullable = false)
     private usuarios documento;
 
-    @ManyToOne
-    @JoinColumn(name = "id_categoria")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "id_categoria", nullable = true)
     private CategoriaPuntaje id_categoria;
 
     @ManyToOne
-    @JoinColumn(name = "id_periodo")
+    @JoinColumn(name = "id_periodo",nullable = false)
     private PeriodoRanking id_periodo;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaHora == null) {
+            this.fechaHora = LocalDateTime.now(); 
+        }
+    }
 }
