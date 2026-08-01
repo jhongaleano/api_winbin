@@ -20,7 +20,7 @@ public class HistorialGanadores {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_premio")
-    private TipoPremio tipoPremio;
+    private tipoPremio tipoPremio;
 
     @Column(name = "puntosLogrados")
     private Integer puntosLogrados;
@@ -42,9 +42,9 @@ public class HistorialGanadores {
     @ManyToOne
     @JoinColumn(name = "id_periodo")
     private PeriodoRanking id_periodo;
-}
 
-enum TipoPremio {
-    individual,
-    curso,
+    public enum tipoPremio {
+        INDIVIDUAL,
+        CURSO
+    }
 }

@@ -36,7 +36,7 @@ public class usuarioController {
         return ResponseEntity.ok(usuarioService.listarTodosIncluyendoInactivos());
     }
 
-    @GetMapping("/sr")
+    @GetMapping("/perfil")
     public ResponseEntity<?> obtenerMiPerfil(Authentication authentication) {
         try {
             String documentoUsuarioLogueado = authentication.getName(); 

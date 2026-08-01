@@ -1,7 +1,6 @@
 package tareas.demo.services;
 
 import java.util.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,12 @@ import tareas.demo.repository.CursoRepository;
 @Service
 public class CursosService {
 
-    @Autowired
-    private CursoRepository cursoRepository;
+    private final CursoRepository cursoRepository;
 
+    public CursosService(CursoRepository cursoRepository){
+        this.cursoRepository = cursoRepository;
+    }
+    
     public List<Cursos> obtenerTop10Cursos() {
         // PageRequest.of(numeroDePagina, tamannoDePagina)
         // La página 0 es la primera página. El 10 es la cantidad de filas que quieres.
@@ -24,6 +26,13 @@ public class CursosService {
 
         return cursoRepository.findByOrderByPuntosTotalesDesc(topDiez);
     }
+
+    public Cursos obtenerCursoTop() {
+
+        Pageable top = PageRequest.of(0, 1);
+        List<Cursos> resultado = cursoRepository.findByOrderByPuntosTotalesDesc(top);
+        return resultado.isEmpty() ? null : resultado.get(0);
+    } 
 
     public List<Cursos> obtenerSiguientes10Cursos() {
         // Si en la app móvil el usuario desliza hacia abajo (scroll), pides la página 1

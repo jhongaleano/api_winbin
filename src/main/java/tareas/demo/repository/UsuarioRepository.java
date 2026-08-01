@@ -2,9 +2,9 @@ package tareas.demo.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import tareas.demo.models.usuarios;
 
 
@@ -28,6 +28,11 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
 
     @Query(value = "SELECT * FROM usuarios", nativeQuery = true)
     List<usuarios> findAllIncluyendoInactivos();
+
+
+    @Modifying
+    @Query("UPDATE usuarios u SET u.puntos = 0 WHERE u.activo = true")
+    void reiniciarPuntosUsuarios();
 
     void deleteById(String documento);
 }

@@ -20,7 +20,9 @@ public class DetalleSession {
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "id_session", length = 36)
+    
     private UUID id_session;
+        
 
     @Column(name = "fecha_hora",nullable = false)
     private LocalDateTime fechaHora;

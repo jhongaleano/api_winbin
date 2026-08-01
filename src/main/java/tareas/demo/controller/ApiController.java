@@ -13,9 +13,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @RequestMapping("/api")
 public class ApiController {
 
-    @Autowired
-    private RequestMappingHandlerMapping handlerMapping;
+    private final RequestMappingHandlerMapping handlerMapping;
 
+    public ApiController(RequestMappingHandlerMapping handlerMapping){
+        this.handlerMapping = handlerMapping;
+    }
     @GetMapping
     public Map<String, String> indexarEndpoints(HttpServletRequest request) {
         Map<String, String> endpoints = new TreeMap<>();

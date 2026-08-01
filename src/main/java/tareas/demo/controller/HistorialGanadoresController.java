@@ -1,7 +1,6 @@
 package tareas.demo.controller;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.models.HistorialGanadores;
 import tareas.demo.repository.HistorialGanadoresRepository;
@@ -11,8 +10,11 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/api/HistorialGanadores")
 public class HistorialGanadoresController {
 
-    @Autowired
-    private HistorialGanadoresRepository repositorio;
+    private final HistorialGanadoresRepository repositorio;
+
+    public HistorialGanadoresController(HistorialGanadoresRepository repositorio){
+        this.repositorio = repositorio;
+    }
 
     @GetMapping
     public List<HistorialGanadores> listar() {
