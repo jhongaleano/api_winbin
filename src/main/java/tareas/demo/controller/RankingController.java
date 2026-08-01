@@ -1,7 +1,6 @@
 package tareas.demo.controller;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.models.Cursos;
@@ -12,11 +11,17 @@ import tareas.demo.services.*;
 @RequestMapping("/api/ranking") // Permite que Flutter se conecte sin problemas de CORS
 public class RankingController {
 
-    @Autowired
+    
     private UsuarioService usuarioService;
 
-    @Autowired
+    
     private CursosService cursosService;
+
+    
+    public RankingController(UsuarioService usuarioService, CursosService cursosService) {
+        this.usuarioService = usuarioService;
+        this.cursosService = cursosService;
+    }
 
     /**
      * Endpoint para obtener el Ranking General de Usuarios
@@ -28,6 +33,16 @@ public class RankingController {
         return ResponseEntity.ok(ranking);
     }
 
+
+    @GetMapping("/top-usuario")
+    public ResponseEntity<?> getTopUsuario() {
+        usuarios topUser = usuarioService.obtenerUsuarioTOP();
+        if (topUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(topUser);
+    }
+
     /**
      * Endpoint para obtener el Ranking por Cursos
      * URL: GET http://localhost:8080/api/ranking/cursos
@@ -36,5 +51,14 @@ public class RankingController {
     public ResponseEntity<List<Cursos>> getRankingCursos() {
         List<Cursos> ranking = cursosService.obtenerTop10Cursos();
         return ResponseEntity.ok(ranking);
+    }
+
+    @GetMapping("/top-curso")
+    public ResponseEntity<?> getTopCurso() {
+        Cursos topCurso = cursosService.obtenerCursoTop();
+        if (topCurso == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(topCurso);
     }
 }

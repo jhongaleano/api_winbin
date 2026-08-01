@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tareas.demo.models.PeriodoRanking;
 import tareas.demo.repository.PeriodoRankingRepository;
+import tareas.demo.services.CierrePeriodoService;
 import tareas.demo.services.PeriodoRankingService;
 
 import java.util.Map;
@@ -24,10 +25,12 @@ public class PeriodoRankingController {
     
     private final PeriodoRankingRepository repositorio;
     private final PeriodoRankingService periodoService;
+    private final CierrePeriodoService cierrePeriodoService;
 
-    public PeriodoRankingController(PeriodoRankingRepository repositorio, PeriodoRankingService periodoService){
+    public PeriodoRankingController(PeriodoRankingRepository repositorio, PeriodoRankingService periodoService, CierrePeriodoService cierrePeriodoService){
         this.repositorio = repositorio;
         this.periodoService = periodoService;
+        this.cierrePeriodoService = cierrePeriodoService;
     }
 
     @GetMapping
@@ -48,6 +51,19 @@ public class PeriodoRankingController {
     @PostMapping
     public PeriodoRanking crear(@RequestBody PeriodoRanking nuevo) {
         return repositorio.save(nuevo);
+    }
+
+    @PostMapping("/{id}/cerrar")
+    public ResponseEntity<?> cerrarPeriodoManualmente(@PathVariable String id) {
+        PeriodoRanking periodo = repositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Período no encontrado"));
+
+        cierrePeriodoService.ejecutarCierreYReiniciarPuntos(periodo);
+
+        periodo.setActivo(false);
+        repositorio.save(periodo);
+
+        return ResponseEntity.ok(Map.of("mensaje", "Período cerrado, ganadores guardados y puntos reiniciados a 0 con éxito."));
     }
 
     @DeleteMapping("/{id}")

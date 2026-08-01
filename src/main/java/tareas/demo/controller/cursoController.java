@@ -1,7 +1,6 @@
 package tareas.demo.controller;
 import tareas.demo.models.Cursos;
 import tareas.demo.repository.CursoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +10,12 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/api/cursos")
 
 public class cursoController{
-    @Autowired
-    private CursoRepository repositorio;
 
+    private final CursoRepository repositorio;
+
+    public cursoController(CursoRepository repositorio){
+        this.repositorio = repositorio;
+    }
     @GetMapping
     public List<Cursos> listar(){
         return repositorio.findAll();

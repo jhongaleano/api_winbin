@@ -47,6 +47,8 @@ public class Security {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/error").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api").permitAll()
+                    .requestMatchers("/api/ranking/top-usuario").permitAll()
+                    .requestMatchers("/api/ranking/top-curso").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/cursos").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/usuarios/registro").permitAll()

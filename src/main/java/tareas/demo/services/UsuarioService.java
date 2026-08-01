@@ -56,6 +56,13 @@ public class UsuarioService {
         return usuarioRepository.findTop10ByOrderByPuntosDesc(topDiez);
     }
 
+
+    public usuarios obtenerUsuarioTOP() {
+        Pageable topUno = PageRequest.of(0, 1);
+        List<usuarios> resultado = usuarioRepository.findTop10ByOrderByPuntosDesc(topUno);
+        return resultado.isEmpty() ? null : resultado.get(0);
+    }
+
     public List<usuarios> obtenerSiguientes10Estudiantes() {
         Pageable siguientesDiez = PageRequest.of(1, 10);
         return usuarioRepository.findTop10ByOrderByPuntosDesc(siguientesDiez);
