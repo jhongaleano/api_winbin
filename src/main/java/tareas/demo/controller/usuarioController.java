@@ -3,6 +3,8 @@ package tareas.demo.controller;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import tareas.demo.dto.CambiarPasswordDTO;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
 import tareas.demo.services.UsuarioService;
@@ -13,8 +15,8 @@ import java.util.Map;
 @RequestMapping("/api/usuarios")
 public class usuarioController {
 
-    private  final UsuarioRepository repositorio;
-    private  final UsuarioService usuarioService;
+    private final UsuarioRepository repositorio;
+    private final UsuarioService usuarioService;
 
     public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService) {
         this.repositorio = repositorio;
@@ -39,8 +41,8 @@ public class usuarioController {
     @GetMapping("/perfil")
     public ResponseEntity<?> obtenerMiPerfil(Authentication authentication) {
         try {
-            String documentoUsuarioLogueado = authentication.getName(); 
-            
+            String documentoUsuarioLogueado = authentication.getName();
+
             usuarios perfil = usuarioService.obtenerPerfil(documentoUsuarioLogueado);
             return ResponseEntity.ok(perfil);
 
@@ -61,13 +63,12 @@ public class usuarioController {
 
     @PatchMapping("/avatar")
     public ResponseEntity<?> actualizarAvatar(
-        @RequestBody Map<String, String> body,
-        Authentication authentication
-    ) {
+            @RequestBody Map<String, String> body,
+            Authentication authentication) {
         try {
 
-            String documento = authentication.getName(); 
-        
+            String documento = authentication.getName();
+
             String nuevaUrl = body.get("avatarUrl");
 
             if (nuevaUrl == null || nuevaUrl.trim().isEmpty()) {
@@ -75,61 +76,56 @@ public class usuarioController {
             }
 
             usuarioService.actualizarAvatar(documento, nuevaUrl);
-            
 
             return ResponseEntity.ok(Map.of(
-            "mensaje", "Avatar actualizado con éxito",
-            "avatarUrl", nuevaUrl
-        ));
+                    "mensaje", "Avatar actualizado con éxito",
+                    "avatarUrl", nuevaUrl));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al actualizar avatar: " + e.getMessage());
         }
     }
-    
 
     @PostMapping("/registro")
     public ResponseEntity<?> registrar(@RequestBody usuarios nuevoUsuario) {
         try {
             usuarios usuarioGuardado = usuarioService.guardarUsuario(
-                nuevoUsuario
-            );
+                    nuevoUsuario);
             return ResponseEntity.ok(usuarioGuardado);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                "Error al registrar: " + e.getMessage()
-            );
+                    "Error al registrar: " + e.getMessage());
         }
     }
 
     @PutMapping("/{documento}")
     public ResponseEntity<?> actualizar(
-        @PathVariable String documento,
-        @RequestBody usuarios usuarioActualizado
-    ) {
-        try{
+            @PathVariable String documento,
+            @RequestBody usuarios usuarioActualizado) {
+        try {
             usuarios usuarioModificado = repositorio.findById(documento)
-            .map(usuario -> {
-                usuario.setNombre(usuarioActualizado.getNombre());
-                usuario.setCurso(usuarioActualizado.getCurso());
-                return repositorio.save(usuario);
-            })
-            .orElseThrow(() -> 
-                new RuntimeException("El usuario con documento " + documento + " no existe")
-            );
+                    .map(usuario -> {
+                        if (usuarioActualizado.getNombre() != null) {
+                            usuario.setNombre(usuarioActualizado.getNombre());
+                        }
+                        if (usuarioActualizado.getCurso() != null) {
+                            usuario.setCurso(usuarioActualizado.getCurso());
+                        }
+
+                        return repositorio.save(usuario);
+                    })
+                    .orElseThrow(() -> new RuntimeException("El usuario con documento " + documento + " no existe"));
             return ResponseEntity.ok(usuarioModificado);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                "Error al actualizar: " + e.getMessage()
-            );
+                    "Error al actualizar: " + e.getMessage());
         }
     }
-    
+
     @PutMapping("/{documento}/rol")
     public ResponseEntity<?> cambiarRol(
             @PathVariable String documento,
-            @RequestBody Map<String, String> requestBody
-    ) {
+            @RequestBody Map<String, String> requestBody) {
         try {
             String nuevoRol = requestBody.get("rol");
             if (nuevoRol == null || nuevoRol.isBlank()) {
@@ -154,6 +150,15 @@ public class usuarioController {
         }
     }
 
+    @PutMapping("/perfil/cambiar-password")
+    public ResponseEntity<?> cambiarPassword(@RequestBody CambiarPasswordDTO dto) {
+        try {
+            usuarioService.cambiarPasswordUsuarioAutenticado(dto);
+            return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada con éxito"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @DeleteMapping("/{documento}")
     public ResponseEntity<?> eliminar(@PathVariable String documento) {
@@ -162,8 +167,7 @@ public class usuarioController {
             return ResponseEntity.ok("Usuario eliminado/desactivado correctamente");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                "Error al eliminar: " + e.getMessage()
-            );
+                    "Error al eliminar: " + e.getMessage());
         }
     }
 
