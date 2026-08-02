@@ -2,8 +2,11 @@ package tareas.demo.services;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import tareas.demo.dto.CambiarPasswordDTO;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +17,7 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    
 
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
@@ -106,5 +110,21 @@ public class UsuarioService {
 
         usuario.setAvatarUrl(nuevaUrl);
         usuarioRepository.save(usuario); // Todo se guardará y la auditoría se disparará en el COMMIT único
+    }
+
+    public void cambiarPasswordUsuarioAutenticado(CambiarPasswordDTO dto) {
+
+        String documentoUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        usuarios usuario = usuarioRepository.findById(documentoUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(dto.getPasswordActual(), usuario.getContrasenna())) {
+            throw new RuntimeException("La contraseña actual es incorrecta");
+        }
+
+        usuario.setContrasenna(passwordEncoder.encode(dto.getNuevaPassword()));
+
+        usuarioRepository.save(usuario);
     }
 }

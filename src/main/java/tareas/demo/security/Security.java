@@ -47,6 +47,7 @@ public class Security {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/error").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
                     .requestMatchers("/api/ranking/top-usuario").permitAll()
                     .requestMatchers("/api/ranking/top-curso").permitAll()
                     .requestMatchers("/api/auth/**").permitAll()
@@ -75,12 +76,11 @@ public class Security {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:5173", "*"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
-
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
