@@ -1,8 +1,14 @@
 package tareas.demo.payload;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Credenciales de inicio de sesión")
 public class LoginRequest {
 
+    @Schema(description = "Documento del usuario", example = "1234567890", requiredMode = Schema.RequiredMode.REQUIRED)
     private String documento;
+
+    @Schema(description = "Contraseña del usuario", example = "miPassword123", requiredMode = Schema.RequiredMode.REQUIRED)
     private String contrasenna;
 
     // Constructor vacío (Obligatorio para que Spring procese el JSON)

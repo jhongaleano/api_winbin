@@ -46,6 +46,12 @@ public class Security {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/error").permitAll()
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    ).permitAll()
                     .requestMatchers(HttpMethod.GET, "/api").permitAll()
                     .requestMatchers("/ws/**").permitAll()
                     .requestMatchers("/api/ranking/top-usuario").permitAll()
