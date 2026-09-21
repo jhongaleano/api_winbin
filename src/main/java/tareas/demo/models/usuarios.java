@@ -3,6 +3,8 @@ package tareas.demo.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -27,8 +29,9 @@ public class usuarios {
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false)
-    private String rol = "ROLE_USER";
+    private Rol rol = Rol.ESTUDIANTE;
 
     @ManyToOne
     @JoinColumn(name = "id_curso", nullable = false)
@@ -46,17 +49,26 @@ public class usuarios {
     @Column(name = "avatar_url", nullable = true)
     private String avatarUrl;
 
+    public enum Rol {
+        ESTUDIANTE,
+        ADMIN
+    }
+
     @PrePersist
     public void prePersist() {
         if (this.puntos == null) {
             this.puntos = 0;
         }
-        if (this.rol == null || this.rol.trim().isEmpty()) {
-            this.rol = "ROLE_USER";
+        if (this.rol == null) {
+            this.rol = Rol.ESTUDIANTE;
         }
         if (this.activo == null) {
             this.activo = true; 
         }
+
+
+     
+
     }
 
 }
