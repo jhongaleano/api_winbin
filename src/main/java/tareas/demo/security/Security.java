@@ -55,8 +55,12 @@ public class Security {
                     .requestMatchers(HttpMethod.POST, "/api/usuarios/registro").permitAll()
 
                     .requestMatchers(HttpMethod.POST, "/api/registroia/**").authenticated()
+                    .requestMatchers(HttpMethod.PATCH, "/api/usuarios/avatar").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/api/usuarios/perfil/cambiar-password").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/usuarios/perfil").authenticated()
+                    
 
-                    .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("USER","ESTUDIANTE", "ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ESTUDIANTE", "ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")

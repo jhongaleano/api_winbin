@@ -32,10 +32,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario sin contraseña configurada");
         }
 
-        String rolLimpio = (u.getRol() != null && !u.getRol().isBlank()) ? u.getRol().trim().toUpperCase() : "USER";
-        if (rolLimpio.startsWith("ROLE_")) {
-            rolLimpio = rolLimpio.substring(5); // Remueve "ROLE_" de la cadena
-        }
+        String rolLimpio = u.getRol() != null ? u.getRol().name() : "ESTUDIANTE";
+        
 
         return User.builder()
                 .username(u.getDocumento())

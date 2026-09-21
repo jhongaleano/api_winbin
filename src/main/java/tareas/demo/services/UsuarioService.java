@@ -34,8 +34,8 @@ public class UsuarioService {
         usuario.setContrasenna(passwordCifrada);
 
         usuario.setPuntos(0);
-        if (usuario.getRol() == null || usuario.getRol().trim().isEmpty() || usuario.getRol().contains("ADMIN")) {
-            usuario.setRol("ROLE_USER"); 
+        if (usuario.getRol() == null || usuario.getRol() == usuarios.Rol.ADMIN) {
+            usuario.setRol(usuarios.Rol.ESTUDIANTE);
         }
         usuario.setActivo(true);
 
@@ -76,9 +76,13 @@ public class UsuarioService {
         usuarios usuario = usuarioRepository.findById(documento)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String rolFormateado = nuevoRol.startsWith("ROLE_") ? nuevoRol : "ROLE_" + nuevoRol;
-        usuario.setRol(rolFormateado);
-
+        try {
+            String rolLimpio = nuevoRol.replace("ROLE_", "").toUpperCase();
+            usuarios.Rol rolEnum = usuarios.Rol.valueOf(rolLimpio);
+            usuario.setRol(rolEnum);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("El rol proporcionado no es válido. Opciones: ESTUDIANTE, ADMIN");
+        }
         return usuarioRepository.save(usuario);
     }
 
