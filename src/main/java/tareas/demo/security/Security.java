@@ -23,10 +23,13 @@ public class Security {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public Security(JwtAuthenticationFilter jwtAuthFilter, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+    public Security(JwtAuthenticationFilter jwtAuthFilter, CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                    CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
     
 
@@ -74,6 +77,7 @@ public class Security {
                     .anyRequest().authenticated()
             ).exceptionHandling(exception -> exception
                 .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
             ).sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
