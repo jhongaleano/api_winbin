@@ -15,6 +15,13 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, 
                         HttpServletResponse response, 
                         AuthenticationException authException) throws IOException {
-        response.sendRedirect("/api");
+
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        
+        String jsonError = String.format(
+            "{\"error\":\"No autorizado\", \"mensaje\":\"Debes iniciar sesión para acceder a este recurso\"}");
+        
+        response.getWriter().write(jsonError);
     }
 }
