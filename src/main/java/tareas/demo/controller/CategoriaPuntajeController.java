@@ -1,7 +1,6 @@
 package tareas.demo.controller;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.models.CategoriaPuntaje;
 import tareas.demo.repository.CategoriaPuntajeRepository;
@@ -11,8 +10,11 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/api/CategoriaPuntaje")
 public class CategoriaPuntajeController {
 
-    @Autowired
-    private CategoriaPuntajeRepository repositorio;
+    private final CategoriaPuntajeRepository repositorio;
+
+    public CategoriaPuntajeController(CategoriaPuntajeRepository repositorio) {
+        this.repositorio = repositorio;
+    }
 
     @GetMapping
     public List<CategoriaPuntaje> listar() {
@@ -32,13 +34,20 @@ public class CategoriaPuntajeController {
         repositorio.deleteById(id);
         return ResponseEntity.ok().build();
     }
+    
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<CategoriaPuntaje> actualizar(@PathVariable Integer id, @RequestBody CategoriaPuntaje cambios) {
         return repositorio.findById(id).map(existente -> {
-            existente.setTamanno(cambios.getTamanno());
-            existente.setPuntos(cambios.getPuntos());
-            existente.setId_material(cambios.getId_material());
+            if(cambios.getTamanno() != null){
+                existente.setTamanno(cambios.getTamanno());
+            }
+            if(cambios.getPuntos() != null){
+                existente.setPuntos(cambios.getPuntos());
+            }
+            if(cambios.getId_material() != null){
+                existente.setId_material(cambios.getId_material());
+            }
             CategoriaPuntaje actualizado = repositorio.save(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());

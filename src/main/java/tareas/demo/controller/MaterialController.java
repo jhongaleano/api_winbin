@@ -38,11 +38,15 @@ public class MaterialController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Material> actualizar(@PathVariable Integer id, @RequestBody Material cambios) {
         return repositorio.findById(id).map(existente -> {
-            existente.setNombreMaterial(cambios.getNombreMaterial());
-            existente.setRecursosMultimedia(cambios.getRecursosMultimedia());
+            if(cambios.getNombreMaterial() != null){
+                existente.setNombreMaterial(cambios.getNombreMaterial());
+            }
+            if(cambios.getRecursosMultimedia() != null){
+                existente.setRecursosMultimedia(cambios.getRecursosMultimedia());
+            }
             Material actualizado = repositorio.save(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());

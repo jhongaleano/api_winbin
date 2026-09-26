@@ -37,13 +37,21 @@ public class DetalleSessionController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<DetalleSession> actualizar(@PathVariable UUID id, @RequestBody DetalleSession cambios) {
         return repositorio.findById(id).map(existente -> {
+            if(cambios.getFechaHora() != null){
             existente.setFechaHora(cambios.getFechaHora());
+            }
+            if(cambios.getDocumento() != null){
             existente.setDocumento(cambios.getDocumento());
+            }
+            if(cambios.getId_categoria() != null){
             existente.setId_categoria(cambios.getId_categoria());
+            }
+            if(cambios.getId_periodo() != null){
             existente.setId_periodo(cambios.getId_periodo());
+            }
             DetalleSession actualizado = repositorio.save(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());

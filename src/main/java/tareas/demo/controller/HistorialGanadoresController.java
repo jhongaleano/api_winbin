@@ -35,17 +35,33 @@ public class HistorialGanadoresController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<HistorialGanadores> actualizar(@PathVariable Integer id, @RequestBody HistorialGanadores cambios) {
         return repositorio.findById(id).map(existente -> {
+            if(cambios.getPuesto() != null){
             existente.setPuesto(cambios.getPuesto());
+            }
+            if(cambios.getTipoPremio() != null){
             existente.setTipoPremio(cambios.getTipoPremio());
+            }
+            if(cambios.getPuntosLogrados() != null){
             existente.setPuntosLogrados(cambios.getPuntosLogrados());
+            }
+            if(cambios.getFecha() != null){
             existente.setFecha(cambios.getFecha());
+            }
+            if(cambios.getPremioDado() != null){
             existente.setPremioDado(cambios.getPremioDado());
+            }
+            if(cambios.getDocumento() != null){
             existente.setDocumento(cambios.getDocumento());
+            }
+            if(cambios.getId_curso() != null){
             existente.setId_curso(cambios.getId_curso());
+            }
+            if(cambios.getId_periodo() != null){
             existente.setId_periodo(cambios.getId_periodo());
+            }
             HistorialGanadores actualizado = repositorio.save(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());

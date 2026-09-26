@@ -75,13 +75,24 @@ public class RegistroIAController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<RegistroIa> actualizar(@PathVariable Long id, @RequestBody RegistroIa cambios) {
         return repositorio.findById(id).map(existente -> {
+            if(cambios.getConfianza() != null){
             existente.setConfianza(cambios.getConfianza());
+            }
+            if(cambios.getUtlImagen() != null){
             existente.setUtlImagen(cambios.getUtlImagen());
+            }
+            if(cambios.getIdSession() != null){
             existente.setIdSession(cambios.getIdSession());
+            }
+            if(cambios.getMaterial() != null){
             existente.setMaterial(cambios.getMaterial());
+            }
+            if(cambios.getCategoria() != null){
+                existente.setCategoria(cambios.getCategoria());
+            }
             RegistroIa actualizado = repositorio.save(existente);
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());
