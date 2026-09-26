@@ -11,9 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.config.OpenApiConstants;
 import tareas.demo.dto.CambiarPasswordDTO;
+import tareas.demo.dto.UsuarioRegistroDTO;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
 import tareas.demo.services.UsuarioService;
+
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -105,9 +107,9 @@ public class usuarioController {
             El rol se asigna automáticamente como `ROLE_USER`. No requiere JWT.
             """)
     @PostMapping("/registro")
-    public ResponseEntity<?> registrar(@RequestBody usuarios nuevoUsuario) {
+    public ResponseEntity<?> registrar(@RequestBody UsuarioRegistroDTO dto) {
         try {
-            usuarios usuarioGuardado = usuarioService.guardarUsuario(nuevoUsuario);
+            usuarios usuarioGuardado = usuarioService.guardarUsuario(dto);
             return ResponseEntity.ok(usuarioGuardado);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al registrar: " + e.getMessage());

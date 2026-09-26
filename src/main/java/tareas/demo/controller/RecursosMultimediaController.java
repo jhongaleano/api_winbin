@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import tareas.demo.config.OpenApiConstants;
 import tareas.demo.models.RecursosMultimedia;
 import tareas.demo.repository.RecursosMultimediaRepository;

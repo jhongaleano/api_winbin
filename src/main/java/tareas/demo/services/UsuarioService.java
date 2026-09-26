@@ -7,7 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import tareas.demo.dto.CambiarPasswordDTO;
+import tareas.demo.dto.UsuarioRegistroDTO;
+import tareas.demo.models.Cursos;
 import tareas.demo.models.usuarios;
+import tareas.demo.repository.CursoRepository;
 import tareas.demo.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 
@@ -17,29 +20,34 @@ import java.util.List;
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CursoRepository cursoRepository;
     
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, CursoRepository cursoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.cursoRepository = cursoRepository; 
     }
 
-    public usuarios guardarUsuario(usuarios usuario){
+    public usuarios guardarUsuario(UsuarioRegistroDTO registroDTO) {
 
-        if(usuarioRepository.findByDocumento(usuario.getDocumento()).isPresent()){
-            throw new RuntimeException("El usuario con documento " + usuario.getDocumento() + " ya existe");
+        if(usuarioRepository.findByDocumento(registroDTO.getDocumento()).isPresent()){
+            throw new RuntimeException("El usuario con documento " + registroDTO.getDocumento() + " ya existe");
         }
 
-        String passwordCifrada = passwordEncoder.encode(usuario.getContrasenna());
-        usuario.setContrasenna(passwordCifrada);
+        Cursos cursoEncontrado = cursoRepository.findById(registroDTO.getId_curso())
+                .orElseThrow(() -> new RuntimeException("El curso con ID " + registroDTO.getId_curso() + " no existe"));
 
-        usuario.setPuntos(0);
-        if (usuario.getRol() == null || usuario.getRol() == usuarios.Rol.ADMIN) {
-            usuario.setRol(usuarios.Rol.ESTUDIANTE);
-        }
-        usuario.setActivo(true);
-
-        return usuarioRepository.save(usuario);
+        usuarios nuevoUsuario = new usuarios();
+        nuevoUsuario.setDocumento(registroDTO.getDocumento());
+        nuevoUsuario.setNombre(registroDTO.getNombre());
+        String passwordCifrada = passwordEncoder.encode(registroDTO.getContrasenna());
+        nuevoUsuario.setContrasenna(passwordCifrada);
+        nuevoUsuario.setCurso(cursoEncontrado);
+        nuevoUsuario.setPuntos(0);
+        nuevoUsuario.setRol(usuarios.Rol.ESTUDIANTE);
+        nuevoUsuario.setActivo(true);
+        return usuarioRepository.save(nuevoUsuario);
     }
 
     public void eliminarUsuario(String documento){
