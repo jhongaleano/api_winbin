@@ -6,8 +6,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import tareas.demo.config.OpenApiConstants;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tareas.demo.models.PeriodoRanking;
 import tareas.demo.repository.PeriodoRankingRepository;
 import tareas.demo.services.CierrePeriodoService;
@@ -93,15 +99,23 @@ public class PeriodoRankingController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Actualizar periodo", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<PeriodoRanking> actualizar(@PathVariable String id, @RequestBody PeriodoRanking cambios) {
         return repositorio.findById(id).map(existente -> {
-            existente.setNombrePeriodo(cambios.getNombrePeriodo());
-            existente.setFechaInicio(cambios.getFechaInicio());
-            existente.setFechaFin(cambios.getFechaFin());
-            existente.setActivo(cambios.getActivo());
-            return ResponseEntity.ok(repositorio.save(existente));
+            if(cambios.getNombrePeriodo() != null){
+                existente.setNombrePeriodo(cambios.getNombrePeriodo());
+            }
+            if(cambios.getFechaInicio() != null){
+                existente.setFechaInicio(cambios.getFechaInicio());
+            }
+            if(cambios.getFechaFin() != null){
+                existente.setFechaFin(cambios.getFechaFin());
+            }
+            if(cambios.getActivo() != null){
+                existente.setActivo(cambios.getActivo());
+            }
+            PeriodoRanking actualizado = repositorio.save(existente);
+            return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());
     }
 }

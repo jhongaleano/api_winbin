@@ -44,13 +44,17 @@ public class cursoController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Actualizar curso", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Cursos> actualizar(@PathVariable Integer id, @RequestBody Cursos cambios) {
         return repositorio.findById(id).map(existente -> {
+            if(cambios.getNombreCurso() != null){
             existente.setNombreCurso(cambios.getNombreCurso());
+            }
+            if(cambios.getPuntosTotales() != null){
             existente.setPuntosTotales(cambios.getPuntosTotales());
-            return ResponseEntity.ok(repositorio.save(existente));
+            }
+            Cursos actualizado = repositorio.save(existente);
+            return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());
     }
 }
