@@ -1,12 +1,17 @@
 package tareas.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
+import tareas.demo.config.OpenApiConstants;
 import tareas.demo.models.RecursosMultimedia;
 import tareas.demo.repository.RecursosMultimediaRepository;
-import org.springframework.http.ResponseEntity;
+
 @RestController
 @RequestMapping("/api/RecursosMultimedia")
+@Tag(name = "Recursos multimedia", description = "Recursos educativos (videos, imágenes, documentos) asociados a materiales")
 public class RecursosMultimediaController {
 
     private final RecursosMultimediaRepository repositorio;
@@ -15,16 +20,19 @@ public class RecursosMultimediaController {
         this.repositorio = repositorio;
     }
 
+    @Operation(summary = "Listar recursos", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
     public List<RecursosMultimedia> listar() {
         return repositorio.findAll();
     }
 
+    @Operation(summary = "Crear recurso", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @PostMapping
     public RecursosMultimedia crear(@RequestBody RecursosMultimedia nuevo) {
         return repositorio.save(nuevo);
     }
 
+    @Operation(summary = "Eliminar recurso", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         if (!repositorio.existsById(id)) {
@@ -56,7 +64,4 @@ public class RecursosMultimediaController {
             return ResponseEntity.ok(actualizado);
         }).orElse(ResponseEntity.notFound().build());
     }
-    
-
-
 }

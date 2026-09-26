@@ -1,31 +1,39 @@
 package tareas.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tareas.demo.config.OpenApiConstants;
 import tareas.demo.models.HistorialGanadores;
 import tareas.demo.repository.HistorialGanadoresRepository;
-import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/HistorialGanadores")
+@Tag(name = "Historial de ganadores", description = "Registro de ganadores individuales (INDIVIDUAL) y por curso (CURSO) al cerrar un periodo")
 public class HistorialGanadoresController {
 
     private final HistorialGanadoresRepository repositorio;
 
-    public HistorialGanadoresController(HistorialGanadoresRepository repositorio){
+    public HistorialGanadoresController(HistorialGanadoresRepository repositorio) {
         this.repositorio = repositorio;
     }
 
+    @Operation(summary = "Listar historial", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
     public List<HistorialGanadores> listar() {
         return repositorio.findAll();
     }
 
+    @Operation(summary = "Crear registro de historial", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @PostMapping
     public HistorialGanadores crear(@RequestBody HistorialGanadores nuevo) {
         return repositorio.save(nuevo);
     }
 
+    @Operation(summary = "Eliminar registro", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
         if (!repositorio.existsById(id)) {
