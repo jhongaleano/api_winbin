@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import tareas.demo.models.Auditoria;
 import tareas.demo.models.usuarios;
-import tareas.demo.repository.UsuarioRepository;
 
 
 @Component
