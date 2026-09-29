@@ -35,4 +35,10 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
     void reiniciarPuntosUsuarios();
 
     void deleteById(String documento);
+
+
+    long countByActivoFalse();
+    
+    @Query("SELECT COALESCE(SUM(u.puntos), 0) FROM Usuario u")
+    long sumarPuntosTodosLosUsuarios();
 }
