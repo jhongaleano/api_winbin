@@ -39,6 +39,6 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
 
     long countByActivoFalse();
     
-    @Query("SELECT COALESCE(SUM(u.puntos), 0) FROM Usuario u")
+    @Query("SELECT COALESCE(SUM(u.puntos), 0) FROM usuarios u")
     long sumarPuntosTodosLosUsuarios();
 }
