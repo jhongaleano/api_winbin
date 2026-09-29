@@ -11,10 +11,11 @@ import tareas.demo.models.RegistroIa;
 @Repository
 public interface RegistroIaRepository extends JpaRepository<RegistroIa, Long> {
 
-    @Query("SELECT new tareas.demo.dto.GraficoDTO(FUNCTION('DATE_FORMAT', r.session.fechaHora, '%Y-%m-%d'), COUNT(r)) "
-            +
-            "FROM RegistroIa r " +
-            "GROUP BY FUNCTION('DATE_FORMAT', r.session.fechaHora, '%Y-%m-%d') " +
-            "ORDER BY FUNCTION('DATE_FORMAT', r.session.fechaHora, '%Y-%m-%d') ASC")
+    @Query(value = "SELECT DATE_FORMAT(s.fecha_hora, '%Y-%m-%d') AS fecha, COUNT(r.id_registro) AS cantidad " +
+            "FROM registro_ia r " +
+            "JOIN detalle_session s ON r.id_session = s.id_session " +
+            "GROUP BY DATE_FORMAT(s.fecha_hora, '%Y-%m-%d') " +
+            "ORDER BY DATE_FORMAT(s.fecha_hora, '%Y-%m-%d') ASC", nativeQuery = true)
     List<GraficoDTO> obtenerReciclajePorDia();
+
 }

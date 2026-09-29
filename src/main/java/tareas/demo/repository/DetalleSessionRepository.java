@@ -12,10 +12,10 @@ import java.util.UUID;
 @Repository
 public interface DetalleSessionRepository
         extends JpaRepository<DetalleSession, UUID> {
-    @Query("SELECT new tareas.demo.dto.GraficoDTO(FUNCTION('DATE_FORMAT', d.fechaHora, '%Y-%m-%d'), COUNT(d)) " +
-            "FROM DetalleSession d " +
-            "GROUP BY FUNCTION('DATE_FORMAT', d.fechaHora, '%Y-%m-%d') " +
-            "ORDER BY FUNCTION('DATE_FORMAT', d.fechaHora, '%Y-%m-%d') ASC")
+    @Query(value = "SELECT DATE_FORMAT(d.fecha_hora, '%Y-%m-%d') AS fecha, COUNT(d.id_session) AS cantidad " +
+            "FROM detalle_session d " +
+            "GROUP BY DATE_FORMAT(d.fecha_hora, '%Y-%m-%d') " +
+            "ORDER BY DATE_FORMAT(d.fecha_hora, '%Y-%m-%d') ASC", nativeQuery = true)
     List<GraficoDTO> obtenerSesionesPorDia();
 
 }
