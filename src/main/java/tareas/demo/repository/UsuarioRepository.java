@@ -37,7 +37,8 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
     void deleteById(String documento);
 
 
-    long countByActivoFalse();
+    @Query(value = "SELECT COUNT(*) FROM usuarios WHERE activo = 0 OR activo IS NULL", nativeQuery = true)
+long contarUsuariosInactivos();
     
     @Query("SELECT COALESCE(SUM(u.puntos), 0) FROM usuarios u")
     long sumarPuntosTodosLosUsuarios();
