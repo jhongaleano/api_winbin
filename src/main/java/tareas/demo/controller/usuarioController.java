@@ -22,6 +22,9 @@ import tareas.demo.services.UsuarioService;
 @Tag(name = "Usuarios", description = "Gestión de usuarios, perfiles, roles, avatares y contraseñas")
 public class usuarioController {
 
+    @Autowired
+    private cursoRepository cursoRepository;
+
     private final UsuarioRepository repositorio;
     private final UsuarioService usuarioService;
 
@@ -132,7 +135,7 @@ public class usuarioController {
                             usuario.setPuntos(usuarioActualizado.getPuntos());
                         }
                         if (usuarioActualizado.getCurso() != null && usuarioActualizado.getCurso().getId_curso() != null) {
-                            Long idCurso = usuarioActualizado.getCurso().getId_curso();
+                            Integer idCurso = usuarioActualizado.getCurso().getId_curso();
                             cursoRepository.findById(idCurso).ifPresent(cursoCompleto -> {
                             usuario.setCurso(cursoCompleto);
                             });
