@@ -128,9 +128,16 @@ public class usuarioController {
                         if (usuarioActualizado.getNombre() != null) {
                             usuario.setNombre(usuarioActualizado.getNombre());
                         }
-                        if (usuarioActualizado.getCurso() != null) {
-                            usuario.setCurso(usuarioActualizado.getCurso());
+                        if (usuarioActualizado.getPuntos() != null) {
+                            usuario.setPuntos(usuarioActualizado.getPuntos());
                         }
+                        if (usuarioActualizado.getCurso() != null && usuarioActualizado.getCurso().getId_curso() != null) {
+                            Long idCurso = usuarioActualizado.getCurso().getId_curso();
+                            cursoRepository.findById(idCurso).ifPresent(cursoCompleto -> {
+                            usuario.setCurso(cursoCompleto);
+                            });
+                        }
+                       
                         return repositorio.save(usuario);
                     })
                     .orElseThrow(() -> new RuntimeException("El usuario con documento " + documento + " no existe"));
