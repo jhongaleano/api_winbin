@@ -83,9 +83,9 @@ public class UsuarioService {
         messagingTemplate.convertAndSend("/topic/ranking/estudiante-top", obtenerUsuarioTOP());
     }
 
-    public List<usuarios> obtenerSiguientes10Estudiantes() {
-        Pageable siguientesDiez = PageRequest.of(1, 10);
-        return usuarioRepository.findTop10ByOrderByPuntosDesc(siguientesDiez);
+    public List<usuarios> obtenerUsuariosPaginados(int page) {
+        Pageable pagina = PageRequest.of(page, 10);
+        return usuarioRepository.findTop10ByOrderByPuntosDesc(pagina);
     }
 
     public usuarios cambiarRolUsuario(String documento, String nuevoRol) {
