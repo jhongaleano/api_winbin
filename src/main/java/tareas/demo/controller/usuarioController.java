@@ -14,6 +14,7 @@ import tareas.demo.dto.CambiarPasswordDTO;
 import tareas.demo.dto.UsuarioRegistroDTO;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
+import tareas.demo.repository.CursoRepository;
 import tareas.demo.services.UsuarioService;
 
 
@@ -22,15 +23,15 @@ import tareas.demo.services.UsuarioService;
 @Tag(name = "Usuarios", description = "Gestión de usuarios, perfiles, roles, avatares y contraseñas")
 public class usuarioController {
 
-    @Autowired
-    private cursoRepository cursoRepository;
+    private final CursoRepository cursoRepository;
 
     private final UsuarioRepository repositorio;
     private final UsuarioService usuarioService;
 
-    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService) {
+    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService, CursoRepository cursoRepository) {
         this.repositorio = repositorio;
         this.usuarioService = usuarioService;
+        this.cursoRepository = cursoRepository;
     }
 
     @Operation(summary = "Listar usuarios activos", description = "Retorna todos los usuarios con `activo = true`. Requiere JWT (USER/ESTUDIANTE/ADMIN).",
