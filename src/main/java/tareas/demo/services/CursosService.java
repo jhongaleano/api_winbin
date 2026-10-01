@@ -3,6 +3,7 @@ package tareas.demo.services;
 import java.util.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import tareas.demo.models.Cursos;
 import tareas.demo.repository.CursoRepository;
@@ -14,9 +15,11 @@ import tareas.demo.repository.CursoRepository;
 public class CursosService {
 
     private final CursoRepository cursoRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public CursosService(CursoRepository cursoRepository){
+    public CursosService(CursoRepository cursoRepository, SimpMessagingTemplate messagingTemplate){
         this.cursoRepository = cursoRepository;
+        this.messagingTemplate = messagingTemplate;
     }
     
     public List<Cursos> obtenerTop10Cursos() {
@@ -34,10 +37,12 @@ public class CursosService {
         return resultado.isEmpty() ? null : resultado.get(0);
     } 
 
-    public List<Cursos> obtenerSiguientes10Cursos() {
-        // Si en la app móvil el usuario desliza hacia abajo (scroll), pides la página 1
-        Pageable siguientesDiez = PageRequest.of(1, 10);
-
-        return cursoRepository.findByOrderByPuntosTotalesDesc(siguientesDiez);
+    public List<Cursos> obtenerCursosPaginados(int numeroPagina) {
+        Pageable pagina = PageRequest.of(numeroPagina, 10);
+        return cursoRepository.findByOrderByPuntosTotalesDesc(pagina);
+    }
+    public void notificarRankingsCursosWebsocket() {
+        messagingTemplate.convertAndSend("/topic/ranking/cursos-top10", obtenerTop10Cursos());
+        messagingTemplate.convertAndSend("/topic/ranking/curso-top", obtenerCursoTop());
     }
 }

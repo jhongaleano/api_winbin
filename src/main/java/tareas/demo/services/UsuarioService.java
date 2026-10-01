@@ -2,6 +2,7 @@ package tareas.demo.services;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,14 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final CursoRepository cursoRepository;
+    private final SimpMessagingTemplate messagingTemplate;
     
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, CursoRepository cursoRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, CursoRepository cursoRepository, SimpMessagingTemplate messagingTemplate) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.cursoRepository = cursoRepository; 
+        this.messagingTemplate = messagingTemplate;
     }
 
     public usuarios guardarUsuario(UsuarioRegistroDTO registroDTO) {
@@ -73,6 +76,11 @@ public class UsuarioService {
         Pageable topUno = PageRequest.of(0, 1);
         List<usuarios> resultado = usuarioRepository.findTop10ByOrderByPuntosDesc(topUno);
         return resultado.isEmpty() ? null : resultado.get(0);
+    }
+    
+    public void notificarRankingsUsuariosWebsocket() {
+        messagingTemplate.convertAndSend("/topic/ranking/estudiantes-top10", obtenerTop10Estudiantes());
+        messagingTemplate.convertAndSend("/topic/ranking/estudiante-top", obtenerUsuarioTOP());
     }
 
     public List<usuarios> obtenerSiguientes10Estudiantes() {
