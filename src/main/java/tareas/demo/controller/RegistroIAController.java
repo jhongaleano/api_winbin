@@ -25,11 +25,11 @@ import tareas.demo.services.RegistroIaService;
 @Tag(name = "Registro IA", description = "Resultados de clasificación del servicio de inteligencia artificial")
 public class RegistroIAController {
 
-    private final RegistroIaService registroIaService;
-    private final RegistroIaRepository registroIaRepository;
+    private final RegistroIaService registroIaService ;
+    private final RegistroIaRepository repositorio ;
 
-    public RegistroIAController(RegistroIaRepository repository, RegistroIaService registroIaService) {
-        this.repository = repository;
+    public RegistroIAController(RegistroIaRepository repositorio, RegistroIaService registroIaService) {
+        this.repositorio = repositorio;
         this.registroIaService = registroIaService;
     }
 

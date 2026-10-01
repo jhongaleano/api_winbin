@@ -52,7 +52,7 @@ public class RankingController {
             security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping("usuarios/paginado")
     public ResponseEntity<List<usuarios>> obtenerPaginados(@RequestParam(defaultValue = "1") int page) {
-       return ResponseEntity.ok(usuarioService.obtenerUsuariosPaginados(page));
+        return ResponseEntity.ok(usuarioService.obtenerUsuariosPaginados(page));
     }
 
    
