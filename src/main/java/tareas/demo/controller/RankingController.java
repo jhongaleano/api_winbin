@@ -30,7 +30,7 @@ public class RankingController {
             description = "Top 10 usuarios con más puntos. Requiere JWT (USER/ESTUDIANTE/ADMIN).",
             security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH)
     )
-    @GetMapping("/general")
+    @GetMapping("/top10/estudiantes")
     public ResponseEntity<List<usuarios>> getRankingGeneral() {
         return ResponseEntity.ok(usuarioService.obtenerTop10Estudiantes());
     }
@@ -48,15 +48,23 @@ public class RankingController {
         return ResponseEntity.ok(topUser);
     }
 
-    @Operation(
-            summary = "Ranking de cursos",
-            description = "Top 10 cursos con más puntos totales. Requiere JWT.",
-            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH)
-    )
-    @GetMapping("/cursos")
+    @Operation(summary = "Obtener usuarios paginados", description = "Obtiene los usuarios paginados.",
+            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
+    @GetMapping("usuarios/paginado")
+    public ResponseEntity<List<usuarios>> obtenerPaginados(@RequestParam(defaultValue = "1") int page) {
+       return ResponseEntity.ok(usuarioService.obtenerUsuariosPaginados(page));
+    }
+
+   
+
+    @Operation(summary = "Obtener top 10 cursos", description = "Obtiene los top 10 cursos.",
+            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
+    @GetMapping("top10/cursos")
     public ResponseEntity<List<Cursos>> getRankingCursos() {
         return ResponseEntity.ok(cursosService.obtenerTop10Cursos());
     }
+
+
 
     @Operation(
             summary = "Curso con más puntos",
@@ -69,5 +77,12 @@ public class RankingController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(topCurso);
+    }
+
+    @Operation(summary = "Obtener cursos paginados", description = "Obtiene los cursos paginados.",
+            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
+    @GetMapping("cursos/paginado")
+    public ResponseEntity<List<Cursos>> obtenerPaginadosCursos(@RequestParam(defaultValue = "1") int page) {
+        return ResponseEntity.ok(cursosService.obtenerCursosPaginados(page));
     }
 }
