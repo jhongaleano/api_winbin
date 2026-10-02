@@ -59,7 +59,7 @@ public class RegistroIaService {
         RegistroIa existente = registroIaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Registro IA no encontrado"));
 
-        Integer categoriaAntiguaId = (existente.getCategoria() != null) ? existente.getCategoria().getIdCategoria() : null;
+        Integer categoriaAntiguaId = (existente.getCategoria() != null) ? existente.getCategoria().getId_categoria() : null;
 
         if(cambios.getConfianza() != null) existente.setConfianza(cambios.getConfianza());
         if(cambios.getUtlImagen() != null) existente.setUtlImagen(cambios.getUtlImagen());
@@ -70,7 +70,7 @@ public class RegistroIaService {
 
         RegistroIa actualizado = registroIaRepository.saveAndFlush(existente);
 
-        Integer categoriaNuevaId = (actualizado.getCategoria() != null) ? actualizado.getCategoria().getIdCategoria() : null;
+        Integer categoriaNuevaId = (actualizado.getCategoria() != null) ? actualizado.getCategoria().getId_categoria() : null;
 
        
         boolean cambioCategoria = !Objects.equals(categoriaAntiguaId, categoriaNuevaId);
