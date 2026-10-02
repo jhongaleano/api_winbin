@@ -17,6 +17,7 @@ import tareas.demo.repository.UsuarioRepository;
 import tareas.demo.repository.CursoRepository;
 import tareas.demo.services.CursosService;
 import tareas.demo.services.UsuarioService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 
 @RestController
@@ -30,12 +31,16 @@ public class usuarioController {
 
     private final UsuarioRepository repositorio;
     private final UsuarioService usuarioService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService, CursoRepository cursoRepository, CursosService cursosService) {
+    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService, CursoRepository cursoRepository, CursosService cursosService, SimpMessagingTemplate messagingTemplate) {
         this.repositorio = repositorio;
         this.usuarioService = usuarioService;
         this.cursoRepository = cursoRepository;
         this.cursosService = cursosService;
+        this.messagingTemplate = messagingTemplate;
+        
+
     }
 
     @Operation(summary = "Listar usuarios activos", description = "Retorna todos los usuarios con `activo = true`. Requiere JWT (USER/ESTUDIANTE/ADMIN).",
@@ -149,6 +154,8 @@ public class usuarioController {
                         return repositorio.saveAndFlush(usuario);
                     })
                     .orElseThrow(() -> new RuntimeException("El usuario con documento " + documento + " no existe"));
+                    System.out.println(" [DEBUG CONTROLLER] Usuario actualizado correctamente. ¡Disparando WebSockets!");
+            messagingTemplate.convertAndSend("/topic/ranking/estudiante-top", "{\"nombre\": \"TEST WEBSOCKET\", \"puntos\": 9999}");
             usuarioService.notificarRankingsUsuariosWebsocket();
             cursosService.notificarRankingsCursosWebsocket();
             return ResponseEntity.ok(usuarioModificado);

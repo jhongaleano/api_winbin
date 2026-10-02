@@ -42,6 +42,7 @@ public class CursosService {
         return cursoRepository.findByOrderByPuntosTotalesDesc(pagina);
     }
     public void notificarRankingsCursosWebsocket() {
+        System.out.println(" ¡Disparando WebSocket de Cursos desde Java!");
         messagingTemplate.convertAndSend("/topic/ranking/cursos-top10", obtenerTop10Cursos());
         messagingTemplate.convertAndSend("/topic/ranking/curso-top", obtenerCursoTop());
     }
