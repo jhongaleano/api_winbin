@@ -15,6 +15,7 @@ import tareas.demo.dto.UsuarioRegistroDTO;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
 import tareas.demo.repository.CursoRepository;
+import tareas.demo.services.CursosService;
 import tareas.demo.services.UsuarioService;
 
 
@@ -23,15 +24,18 @@ import tareas.demo.services.UsuarioService;
 @Tag(name = "Usuarios", description = "Gestión de usuarios, perfiles, roles, avatares y contraseñas")
 public class usuarioController {
 
+    private final CursosService cursosService;
+
     private final CursoRepository cursoRepository;
 
     private final UsuarioRepository repositorio;
     private final UsuarioService usuarioService;
 
-    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService, CursoRepository cursoRepository) {
+    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService, CursoRepository cursoRepository, CursosService cursosService) {
         this.repositorio = repositorio;
         this.usuarioService = usuarioService;
         this.cursoRepository = cursoRepository;
+        this.cursosService = cursosService;
     }
 
     @Operation(summary = "Listar usuarios activos", description = "Retorna todos los usuarios con `activo = true`. Requiere JWT (USER/ESTUDIANTE/ADMIN).",
@@ -120,7 +124,7 @@ public class usuarioController {
         }
     }
 
-    @Operation(summary = "Actualizar usuario", description = "Actualiza nombre y curso. Solo ADMIN + JWT.",
+    @Operation(summary = "Actualizar usuario", description = "Actualiza nombre y curso o puntos . Solo ADMIN + JWT.",
             security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @PutMapping("/{documento}")
     public ResponseEntity<?> actualizar(
@@ -142,9 +146,11 @@ public class usuarioController {
                             });
                         }
                        
-                        return repositorio.save(usuario);
+                        return repositorio.saveAndFlush(usuario);
                     })
                     .orElseThrow(() -> new RuntimeException("El usuario con documento " + documento + " no existe"));
+            usuarioService.notificarRankingsUsuariosWebsocket();
+            cursosService.notificarRankingsCursosWebsocket();
             return ResponseEntity.ok(usuarioModificado);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al actualizar: " + e.getMessage());
