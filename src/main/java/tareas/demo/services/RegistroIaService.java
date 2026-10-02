@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tareas.demo.models.*;
 import tareas.demo.repository.*;
-
+import java.util.Objects; 
 @Service
 public class RegistroIaService {
 
@@ -44,29 +44,42 @@ public class RegistroIaService {
         nuevoRegistro.setMaterial(mat);
         nuevoRegistro.setCategoria(cat);
 
-        
         RegistroIa guardado = registroIaRepository.saveAndFlush(nuevoRegistro);
-        usuarioService.notificarRankingsUsuariosWebsocket();
-        cursosService.notificarRankingsCursosWebsocket();
+
+        if (guardado.getCategoria() != null) {
+                usuarioService.notificarRankingsUsuariosWebsocket();
+                cursosService.notificarRankingsCursosWebsocket();
+        }
 
         return guardado;
-    }
+     }
 
     @Transactional
     public RegistroIa actualizarResultadoIA(Long id, RegistroIa cambios) {
         RegistroIa existente = registroIaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Registro IA no encontrado"));
 
+        Integer categoriaAntiguaId = (existente.getCategoria() != null) ? existente.getCategoria().getIdCategoria() : null;
+
         if(cambios.getConfianza() != null) existente.setConfianza(cambios.getConfianza());
         if(cambios.getUtlImagen() != null) existente.setUtlImagen(cambios.getUtlImagen());
         if(cambios.getIdSession() != null) existente.setIdSession(cambios.getIdSession());
         if(cambios.getMaterial() != null) existente.setMaterial(cambios.getMaterial());
+
         if(cambios.getCategoria() != null) existente.setCategoria(cambios.getCategoria());
 
         RegistroIa actualizado = registroIaRepository.saveAndFlush(existente);
 
-        usuarioService.notificarRankingsUsuariosWebsocket();
-        cursosService.notificarRankingsCursosWebsocket();
+        Integer categoriaNuevaId = (actualizado.getCategoria() != null) ? actualizado.getCategoria().getIdCategoria() : null;
+
+       
+        boolean cambioCategoria = !Objects.equals(categoriaAntiguaId, categoriaNuevaId);
+        boolean nuevaNoEsNula = (categoriaNuevaId != null);
+
+        if (cambioCategoria && nuevaNoEsNula) {
+            usuarioService.notificarRankingsUsuariosWebsocket();
+            cursosService.notificarRankingsCursosWebsocket();
+        }
 
         return actualizado;
     }
