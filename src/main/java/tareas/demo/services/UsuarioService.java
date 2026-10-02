@@ -79,8 +79,10 @@ public class UsuarioService {
     }
     
     public void notificarRankingsUsuariosWebsocket() {
+        System.out.println("¡Disparando WebSocket de Usuarios desde Java!");
         messagingTemplate.convertAndSend("/topic/ranking/estudiantes-top10", obtenerTop10Estudiantes());
         messagingTemplate.convertAndSend("/topic/ranking/estudiante-top", obtenerUsuarioTOP());
+        System.out.println(" [DEBUG WEBSOCKET] Mensajes de usuario enviados por STOMP al canal /topic/...");
     }
 
     public List<usuarios> obtenerUsuariosPaginados(int page) {
