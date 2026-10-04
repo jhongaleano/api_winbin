@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.config.OpenApiConstants;
@@ -33,7 +34,15 @@ public class AuditoriaController {
     )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<Auditoria> listar(Pageable pageable) {
+    public Page<Auditoria> listar(
+        @Parameter(description = "Filtro opcional por tipo de acción (ej. INSERT, UPDATE, DELETE)") 
+        @RequestParam(required = false) String accion,
+        @PageableDefault(size = 15, sort = "fecha", direction = Sort.Direction.DESC)
+        Pageable pageable) {
+
+            if (accion != null && !accion.trim().isEmpty()) {
+            return repositorio.findByAccionIgnoreCase(accion, pageable);
+        }
         return repositorio.findAll(pageable);
     }
 }
