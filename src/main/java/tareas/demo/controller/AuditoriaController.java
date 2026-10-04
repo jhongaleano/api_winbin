@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import tareas.demo.config.OpenApiConstants;
 import tareas.demo.models.Auditoria;
 import tareas.demo.repository.AuditoriaRepository;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/auditoria")
@@ -23,24 +25,18 @@ public class AuditoriaController {
         this.repositorio = repositorio;
     }
 
-    @Operation(
-            summary = "Listar auditoría (paginado)",
-            description = """
-                    Solo ADMIN. Parámetros: `?page=0&size=20&sort=fecha,desc`
+    @Operation(summary = "Listar auditoría (paginado)", description = """
+            Solo ADMIN. Parámetros: `?page=0&size=20&sort=fecha,desc`
 
-                    Eventos en tiempo real disponibles en WebSocket: `wss://api-winbin.onrender.com/ws` → `/topic/auditoria`
-                    """,
-            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH)
-    )
+            Eventos en tiempo real disponibles en WebSocket: `wss://api-winbin.onrender.com/ws` → `/topic/auditoria`
+            """, security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Page<Auditoria> listar(
-        @Parameter(description = "Filtro opcional por tipo de acción (ej. INSERT, UPDATE, DELETE)") 
-        @RequestParam(required = false) String accion,
-        @PageableDefault(size = 15, sort = "fecha", direction = Sort.Direction.DESC)
-        Pageable pageable) {
+            @Parameter(description = "Filtro opcional por tipo de acción (ej. INSERT, UPDATE, DELETE)") @RequestParam(required = false) String accion,
+            @PageableDefault(size = 15, sort = "fecha", direction = Sort.Direction.DESC) Pageable pageable) {
 
-            if (accion != null && !accion.trim().isEmpty()) {
+        if (accion != null && !accion.trim().isEmpty()) {
             return repositorio.findByAccionIgnoreCase(accion, pageable);
         }
         return repositorio.findAll(pageable);
