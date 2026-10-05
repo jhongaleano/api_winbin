@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +41,15 @@ public class DetalleSessionController {
 
             @Parameter(description = "ID del periodo a consultar (Opcional)") @RequestParam(required = false) String idPeriodo) {
 
-        return repositorio.findAll(DetalleSessionRepository.conFiltros(documento, fecha, idPeriodo));
+        LocalDateTime inicioDia = null;
+        LocalDateTime finDia = null;
+
+        if (fecha != null) {
+            inicioDia = fecha.atStartOfDay();
+            finDia = fecha.atTime(LocalTime.MAX);
+        }
+
+        return repositorio.buscarPorFiltros(documento, idPeriodo, inicioDia, finDia);
     }
 
     @Operation(summary = "Crear sesión de clasificación", description = """
