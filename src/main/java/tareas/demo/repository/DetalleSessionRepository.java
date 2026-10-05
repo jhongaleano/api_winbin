@@ -31,7 +31,7 @@ public interface DetalleSessionRepository
                         List<Predicate> predicates = new ArrayList<>();
 
                         if (documento != null && !documento.isBlank()) {
-                                predicates.add(criteriaBuilder.equal(root.get("documento").get("documento"),
+                                predicates.add(criteriaBuilder.equal(root.join("documento").get("documento"),
                                                 documento));
                         }
 
@@ -42,7 +42,7 @@ public interface DetalleSessionRepository
                         }
 
                         if (idPeriodo != null && !idPeriodo.isBlank()) {
-                                predicates.add(criteriaBuilder.equal(root.get("id_periodo").get("idPeriodo"),
+                                predicates.add(criteriaBuilder.equal(root.join("id_periodo").get("id_periodo"),
                                                 idPeriodo));
                         }
 
