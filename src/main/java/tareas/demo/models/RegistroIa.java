@@ -21,7 +21,7 @@ public class RegistroIa {
     @Column(name = "confianza")
     private Double confianza;
 
-    @Column(name = "utl_imagen", length = 100)
+    @Column(name = "utl_imagen", length = 255)
     private String utlImagen;
 
 
