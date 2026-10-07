@@ -19,6 +19,9 @@ import tareas.demo.repository.DetalleSessionRepository;
 import tareas.demo.repository.MaterialRepository;
 import tareas.demo.repository.RegistroIaRepository;
 import tareas.demo.services.RegistroIaService;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 @RestController
 @RequestMapping("/api/registroia")
