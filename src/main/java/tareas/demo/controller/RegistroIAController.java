@@ -33,10 +33,10 @@ public class RegistroIAController {
         this.registroIaService = registroIaService;
     }
 
-    @Operation(summary = "Listar registros de IA (paginado)", description = "Solo ADMIN. Parámetros: `?page=0&size=20&sort=idIa,desc`", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
+    @Operation(summary = "Listar registros de IA", description = "Solo ADMIN. Parámetros: `?page=0&size=20&sort=idIa,desc`", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<RegistroIa> listar(Pageable pageable) {
+    public Page<RegistroIa> listar(@PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
         return repositorio.findAll(pageable);
     }
 
