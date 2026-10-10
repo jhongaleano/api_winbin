@@ -9,6 +9,8 @@ import org.hibernate.type.SqlTypes;
 
 import lombok.Data;
 import tareas.demo.config.AuditoriaListener;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @EntityListeners(AuditoriaListener.class)
@@ -27,8 +29,9 @@ public class DetalleSession {
     @Column(name = "fecha_hora",nullable = false)
     private LocalDateTime fechaHora;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "documento",nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private usuarios documento;
 
     @ManyToOne(optional = true)
