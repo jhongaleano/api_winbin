@@ -10,11 +10,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tareas.demo.config.OpenApiConstants;
+import tareas.demo.dto.DetalleSessionDTO;
+import tareas.demo.dto.UsuarioRegistroDTO;
 import tareas.demo.models.DetalleSession;
 import tareas.demo.repository.DetalleSessionRepository;
 
@@ -34,7 +37,7 @@ public class DetalleSessionController {
 
     @Operation(summary = "Listar sesiones", description = "Lista todas las sesiones registradas. Requiere JWT.", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
-    public List<DetalleSession> listar(
+    public List<DetalleSessionDTO> listar(
             @Parameter(description = "Número o ID del documento del usuario (Opcional)") @RequestParam(required = false) String documento,
 
             @Parameter(description = "Fecha exacta de la sesión en formato YYYY-MM-DD (Opcional)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
@@ -49,7 +52,29 @@ public class DetalleSessionController {
             finDia = fecha.atTime(LocalTime.MAX);
         }
 
-        return repositorio.buscarPorFiltros(documento, idPeriodo, inicioDia, finDia);
+        List<DetalleSession> sesiones = repositorio.buscarPorFiltros(documento, idPeriodo, inicioDia, finDia);
+
+        return sesiones.stream().map(sesion -> {
+            DetalleSessionDTO dto = new DetalleSessionDTO();
+            dto.setId_session(sesion.getId_session());
+            dto.setFechaHora(sesion.getFechaHora());
+
+            if (sesion.getDocumento() != null) {
+                UsuarioRegistroDTO usuarioDto = new UsuarioRegistroDTO();
+                usuarioDto.setDocumento(sesion.getDocumento().getDocumento());
+                dto.setDocumento(usuarioDto);
+            }
+
+            if (sesion.getId_periodo() != null) {
+                dto.setId_periodo(sesion.getId_periodo().getId_periodo());
+            }
+
+            if (sesion.getId_categoria() != null) {
+                dto.setId_categoria(sesion.getId_categoria().getId_categoria());
+            }
+
+            return dto;
+        }).toList();
     }
 
     @Operation(summary = "Crear sesión de clasificación", description = """
