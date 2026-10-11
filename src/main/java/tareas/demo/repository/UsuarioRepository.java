@@ -19,6 +19,7 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
     Optional<usuarios> findByDocumento(String documento);
 
     List<usuarios> findTop10ByOrderByPuntosDesc(Pageable pageable);
+    List<usuarios> findAllByOrderByPuntosDesc(Pageable pageable);
 
     @Query(value = "SELECT * FROM usuarios WHERE documento = :documento", nativeQuery = true)
     Optional<usuarios> findByDocumentoIncluyendoInactivos(@Param("documento") String documento);

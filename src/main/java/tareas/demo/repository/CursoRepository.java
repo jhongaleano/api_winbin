@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Pageable;
 import java.util.*;
 import tareas.demo.models.Cursos;
+import tareas.demo.models.usuarios;
 
 
 public interface CursoRepository extends JpaRepository<Cursos, Integer>{

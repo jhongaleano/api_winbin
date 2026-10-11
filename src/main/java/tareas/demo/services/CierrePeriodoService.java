@@ -23,9 +23,8 @@ import tareas.demo.repository.UsuarioRepository;
 public class CierrePeriodoService {
 
     private final UsuarioRepository usuarioRepository;
-
     private final CursoRepository cursoRepository;
-    private HistorialGanadoresRepository historialRepository;
+    private final HistorialGanadoresRepository historialRepository;
 
     public CierrePeriodoService(UsuarioRepository usuarioRepository, CursoRepository cursoRepository, HistorialGanadoresRepository historialRepository){
         this.usuarioRepository = usuarioRepository;
@@ -39,7 +38,7 @@ public class CierrePeriodoService {
         Pageable topDiez = PageRequest.of(0, 10);
         List<HistorialGanadores> historialAGuardar = new ArrayList<>();
 
-        List<usuarios> topUsuarios = usuarioRepository.findTop10ByOrderByPuntosDesc(topDiez);
+        List<usuarios> topUsuarios = usuarioRepository.findAllByOrderByPuntosDesc(topDiez);
         for (int i = 0; i < topUsuarios.size(); i++) {
             usuarios u = topUsuarios.get(i);
 

@@ -13,9 +13,11 @@ import java.util.Optional;
 public class PeriodoRankingService {
 
     private final PeriodoRankingRepository periodoRepository;
+    private final CierrePeriodoService cierrePeriodoService;
 
-    public PeriodoRankingService(PeriodoRankingRepository periodoRepository) {
+    public PeriodoRankingService(PeriodoRankingRepository periodoRepository, CierrePeriodoService cierrePeriodoService) {
         this.periodoRepository = periodoRepository;
+        this.cierrePeriodoService = cierrePeriodoService;
     }
 
     @Transactional
@@ -29,22 +31,28 @@ public class PeriodoRankingService {
             
             PeriodoRanking periodo = periodoActivoOpt.get();
 
-            if(hoy.isBefore(periodo.getFechaInicio()) || hoy.isAfter(periodo.getFechaFin())){
+            if (hoy.isAfter(periodo.getFechaFin())) {
+                cierrePeriodoService.ejecutarCierreYReiniciarPuntos(periodo);
+
                 periodo.setActivo(false);
                 periodoRepository.save(periodo);
-
-                Optional<PeriodoRanking> nuevoPeriodoValido = periodoRepository
-                        .findByFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(hoy, hoy);
-
-                if (nuevoPeriodoValido.isPresent()) {
-                    PeriodoRanking nuevoActive = nuevoPeriodoValido.get();
-                    nuevoActive.setActivo(true);
-                    return Optional.of(periodoRepository.save(nuevoActive));
-                }
-
-                return Optional.empty(); 
+            }else if(hoy.isBefore(periodo.getFechaInicio()) ){
+                periodo.setActivo(false);
+                periodoRepository.save(periodo);
             }
-            return Optional.of(periodo);
+            else{
+                return Optional.of(periodo);
+            }
+            Optional<PeriodoRanking> nuevoPeriodoValido = periodoRepository
+                    .findByFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(hoy, hoy);
+
+            if (nuevoPeriodoValido.isPresent()) {
+                PeriodoRanking nuevoActive = nuevoPeriodoValido.get();
+                nuevoActive.setActivo(true);
+                return Optional.of(periodoRepository.save(nuevoActive));
+            }
+
+            return Optional.empty();
         }
 
         Optional<PeriodoRanking> periodoParaHoy = periodoRepository
