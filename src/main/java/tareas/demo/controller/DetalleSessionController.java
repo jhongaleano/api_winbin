@@ -62,6 +62,8 @@ public class DetalleSessionController {
             if (sesion.getDocumento() != null) {
                 UsuarioRegistroDTO usuarioDto = new UsuarioRegistroDTO();
                 usuarioDto.setDocumento(sesion.getDocumento().getDocumento());
+                usuarioDto.setNombre(sesion.getDocumento().getNombre());
+                
                 dto.setDocumento(usuarioDto);
             }
 
