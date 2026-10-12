@@ -32,7 +32,7 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
 
 
     @Modifying
-    @Query("UPDATE usuarios u SET u.puntos = 0 WHERE u.activo = true")
+    @Query("UPDATE usuarios u SET u.puntos = 0" )
     void reiniciarPuntosUsuarios();
 
     void deleteById(String documento);
