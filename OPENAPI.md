@@ -1,14 +1,14 @@
 # WinBin API — Documentación OpenAPI / Swagger
 
-## URLs en producción (Render)
+## URLs en producción (AWS)
 
 | Recurso | URL |
 |---------|-----|
-| **Índice de endpoints** | https://api-winbin.onrender.com/api |
-| **Swagger UI (interactivo)** | https://api-winbin.onrender.com/swagger-ui/index.html |
-| **OpenAPI JSON** | https://api-winbin.onrender.com/v3/api-docs |
-| **OpenAPI YAML** | https://api-winbin.onrender.com/v3/api-docs.yaml |
-| **Login** | https://api-winbin.onrender.com/api/auth/login |
+| **Índice de endpoints** | https://winbin-api.duckdns.org/api |
+| **Swagger UI (interactivo)** | https://winbin-api.duckdns.org/swagger-ui/index.html |
+| **OpenAPI JSON** | https://winbin-api.duckdns.org/v3/api-docs |
+| **OpenAPI YAML** | https://winbin-api.duckdns.org/v3/api-docs.yaml |
+| **Login** | https://winbin-api.duckdns.org/api/auth/login |
 
 ## URLs en local
 
@@ -24,14 +24,14 @@
 
 ### 1. Abrir la documentación
 
-- **Producción:** https://api-winbin.onrender.com/swagger-ui/index.html
+- **Producción:** https://winbin-api.duckdns.org/swagger-ui/index.html
 - **Local:** `./gradlew bootRun` → http://localhost:8080/swagger-ui/index.html
 
 ### 2. Seleccionar servidor
 
 En la parte superior de Swagger UI elige:
 
-- **Producción — Render** → peticiones van a `https://api-winbin.onrender.com`
+- **Producción — AWS** → peticiones van a `https://winbin-api.duckdns.org`
 - **Desarrollo local** → `http://localhost:8080`
 
 ### 3. Autenticarse con JWT
@@ -58,24 +58,7 @@ Ejemplos recomendados:
 - `GET /api/PeriodoRanking/activo` — periodo vigente
 - `POST /api/registroia/guardar-resultado` — guardar resultado IA
 
----
-
-## Desplegar en Render
-
-### Variables de entorno recomendadas
-
-En el panel de Render → **Environment**:
-
-| Variable | Valor | Descripción |
-|----------|-------|-------------|
-| `SPRING_PROFILES_ACTIVE` | `prod` | Activa `application-prod.properties` |
-| `SPRING_DATASOURCE_URL` | `jdbc:mysql://...` | URL de MySQL |
-| `SPRING_DATASOURCE_USERNAME` | `...` | Usuario BD |
-| `SPRING_DATASOURCE_PASSWORD` | `...` | Contraseña BD |
-| `JWT_SECRET` | clave larga y segura | Firma del JWT |
-| `JWT_EXPIRATION` | `86400000` | 24 h en ms |
-
-> Render inyecta automáticamente `RENDER_EXTERNAL_URL=https://api-winbin.onrender.com`
+--- 
 
 ### Build & Start (Gradle)
 
@@ -86,9 +69,9 @@ Start Command:  java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
 
 ### Verificar después del deploy
 
-1. https://api-winbin.onrender.com/api — índice con URLs correctas
-2. https://api-winbin.onrender.com/swagger-ui/index.html — Swagger UI
-3. https://api-winbin.onrender.com/v3/api-docs — JSON OpenAPI
+1. https://winbin-api.duckdns.org/api — índice con URLs correctas
+2. https://winbin-api.duckdns.org/swagger-ui/index.html — Swagger UI
+3. https://winbin-api.duckdns.org/v3/api-docs — JSON OpenAPI
 
 ---
 
@@ -97,7 +80,7 @@ Start Command:  java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
 ### Postman
 
 1. Abre Postman → **Import**
-2. Pega: `https://api-winbin.onrender.com/v3/api-docs`
+2. Pega: `https://winbin-api.duckdns.org/v3/api-docs`
 3. Se importan todos los endpoints con schemas
 
 ### Flutter / cliente HTTP
@@ -118,4 +101,4 @@ Compatible con **Spring Boot 4.x**. Documentación oficial: [springdoc.org](http
 
 ## Corrección aplicada al índice `/api`
 
-Se corrigió un bug donde las URLs aparecían como `https:/-winbin.onrender.com/...` porque `String.replace("/api", "")` eliminaba el `api` del hostname `api-winbin.onrender.com`. Ahora se usa recorte por URI o headers `X-Forwarded-*` de Render.
+Se corrigió un bug donde las URLs aparecían como `https:/-winbin-api.duckdns.org/...` porque `String.replace("/api", "")` eliminaba el `api` del hostname `winbin-api.duckdns.org`. Ahora se usa recorte por URI o headers `X-Forwarded-*` de Render.

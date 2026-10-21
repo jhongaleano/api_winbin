@@ -32,15 +32,15 @@ public class OpenApiConfig {
 
                                 ---
 
-                                ## URLs de producción (Render)
+                                ## URLs de producción (AWS)
 
                                 | Recurso | URL |
                                 |---------|-----|
-                                | **Índice de endpoints** | [https://api-winbin.onrender.com/api](https://api-winbin.onrender.com/api) |
-                                | **Swagger UI (documentación interactiva)** | [https://api-winbin.onrender.com/swagger-ui/index.html](https://api-winbin.onrender.com/swagger-ui/index.html) |
-                                | **OpenAPI JSON** | [https://api-winbin.onrender.com/v3/api-docs](https://api-winbin.onrender.com/v3/api-docs) |
-                                | **OpenAPI YAML** | [https://api-winbin.onrender.com/v3/api-docs.yaml](https://api-winbin.onrender.com/v3/api-docs.yaml) |
-                                | **WebSocket STOMP** | `wss://api-winbin.onrender.com/ws` |
+                                | **Índice de endpoints** | [https://winbin-api.duckdns.org/api](https://winbin-api.duckdns.org/api) |
+                                | **Swagger UI (documentación interactiva)** | [https://winbin-api.duckdns.org/swagger-ui/index.html](https://winbin-api.duckdns.org/swagger-ui/index.html) |
+                                | **OpenAPI JSON** | [https://winbin-api.duckdns.org/v3/api-docs](https://winbin-api.duckdns.org/v3/api-docs) |
+                                | **OpenAPI YAML** | [https://winbin-api.duckdns.org/v3/api-docs.yaml](https://winbin-api.duckdns.org/v3/api-docs.yaml) |
+                                | **WebSocket STOMP** | `wss://winbin-api.duckdns.org/ws` |
 
                                 ---
 
@@ -49,7 +49,7 @@ public class OpenApiConfig {
                                 1. Ejecuta **`POST /api/auth/login`** con `documento` y `contrasenna`.
                                 2. Copia el `token` de la respuesta.
                                 3. En Swagger UI, pulsa **Authorize** e ingresa: `Bearer <token>`.
-                                4. El token expira en **24 horas** (configurable con `jwt.expiration`).
+                                4. El token expira en **1 hora**.
 
                                 **Header en peticiones manuales:**
                                 ```
@@ -106,14 +106,14 @@ public class OpenApiConfig {
                                 """)
                         .version("1.0.0")
                         .contact(new Contact()
-                                .name("WinBin Team")
-                                .url("https://api-winbin.onrender.com/api")
-                                .email("soporte@winbin.example"))
+                                .name("WinBin ")
+                                .url("https://winbin-api.duckdns.org/api")
+                                .email("padillacristhian2007@gmail.com"))
                         .license(new License().name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")))
                 .addServersItem(new Server()
                         .url(OpenApiConstants.PRODUCTION_URL)
-                        .description("Producción — Render (api-winbin.onrender.com)"))
+                        .description("Producción — Render (winbin-api.duckdns.org)"))
                 .addServersItem(new Server()
                         .url(OpenApiConstants.LOCAL_URL)
                         .description("Desarrollo local"))
