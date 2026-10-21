@@ -23,9 +23,9 @@ public class HistorialGanadoresController {
 
     @Operation(summary = "Listar historial", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
-    public List<HistorialGanadores> listar(@RequestParam(required = false) Integer id_periodo) {
-        if(id_periodo != null){
-            return repositorio.findByPeriodoIdOrderByPuestoAsc(id_periodo);
+    public List<HistorialGanadores> listar(@RequestParam(required = false) String idPeriodo) {
+        if(idPeriodo != null){
+            return repositorio.findByPeriodoIdOrderByPuestoAsc(idPeriodo);
         }
         return repositorio.findAll();
     }
