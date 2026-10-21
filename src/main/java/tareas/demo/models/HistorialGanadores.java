@@ -46,11 +46,11 @@ public class HistorialGanadores {
 
     @ManyToOne
     @JoinColumn(name = "id_periodo")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private PeriodoRanking id_periodo;
 
     public enum tipoPremio {
-        INDIVIDUAL,
-        CURSO
+        individual,
+        curso
     }
 }
