@@ -1,6 +1,5 @@
 package tareas.demo.services;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +25,12 @@ public class CierrePeriodoService {
     private final CursoRepository cursoRepository;
     private final HistorialGanadoresRepository historialRepository;
 
-    public CierrePeriodoService(UsuarioRepository usuarioRepository, CursoRepository cursoRepository, HistorialGanadoresRepository historialRepository){
+    public CierrePeriodoService(UsuarioRepository usuarioRepository, CursoRepository cursoRepository,
+            HistorialGanadoresRepository historialRepository) {
         this.usuarioRepository = usuarioRepository;
         this.cursoRepository = cursoRepository;
         this.historialRepository = historialRepository;
     }
-
 
     @Transactional
     public void ejecutarCierreYReiniciarPuntos(PeriodoRanking periodoActual) {
@@ -43,9 +42,9 @@ public class CierrePeriodoService {
             usuarios u = topUsuarios.get(i);
 
             HistorialGanadores h = new HistorialGanadores();
-            h.setPuesto(i + 1); 
-            h.setTipoPremio(tipoPremio.INDIVIDUAL);
-            h.setPuntosLogrados(u.getPuntos()); 
+            h.setPuesto(i + 1);
+            h.setTipoPremio(tipoPremio.individual);
+            h.setPuntosLogrados(u.getPuntos());
             h.setFecha(LocalDate.now());
             h.setDocumento(u);
             h.setId_curso(u.getCurso());
@@ -61,7 +60,7 @@ public class CierrePeriodoService {
 
             HistorialGanadores h = new HistorialGanadores();
             h.setPuesto(i + 1);
-            h.setTipoPremio(tipoPremio.CURSO);
+            h.setTipoPremio(tipoPremio.curso);
             h.setPuntosLogrados(c.getPuntosTotales());
             h.setFecha(LocalDate.now());
             h.setDocumento(null);
