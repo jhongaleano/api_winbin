@@ -23,7 +23,10 @@ public class HistorialGanadoresController {
 
     @Operation(summary = "Listar historial", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @GetMapping
-    public List<HistorialGanadores> listar() {
+    public List<HistorialGanadores> listar(@RequestParam(required = false) Integer id_periodo) {
+        if(id_periodo != null){
+            return repositorio.findByPeriodoIdOrderByPuestoAsc(id_periodo);
+        }
         return repositorio.findAll();
     }
 
@@ -33,15 +36,6 @@ public class HistorialGanadoresController {
         return repositorio.save(nuevo);
     }
 
-    @Operation(summary = "Eliminar registro", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer id) {
-        if (!repositorio.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        repositorio.deleteById(id);
-        return ResponseEntity.ok().build();
-    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<HistorialGanadores> actualizar(@PathVariable Integer id, @RequestBody HistorialGanadores cambios) {

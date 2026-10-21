@@ -2,6 +2,9 @@ package tareas.demo.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 import tareas.demo.config.AuditoriaListener;
 
@@ -33,14 +36,17 @@ public class HistorialGanadores {
 
     @ManyToOne
     @JoinColumn(name = "documento")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
     private usuarios documento;
 
     @ManyToOne
     @JoinColumn(name = "id_curso", nullable = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Cursos id_curso;
 
     @ManyToOne
     @JoinColumn(name = "id_periodo")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private PeriodoRanking id_periodo;
 
     public enum tipoPremio {
