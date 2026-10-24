@@ -9,6 +9,6 @@ import tareas.demo.models.HistorialGanadores;
 public interface HistorialGanadoresRepository extends JpaRepository<HistorialGanadores, Integer> {
 
     
-    @Query("SELECT h FROM HistorialGanadores h WHERE h.id_periodo.id_periodo = :idPeriodo ORDER BY h.puesto ASC")
+    @Query("SELECT h FROM HistorialGanadores h WHERE h.id_periodo.id_periodo = :idPeriodo")
     List<HistorialGanadores> findByPeriodoIdOrderByPuestoAsc(@Param("idPeriodo") String idPeriodo);
 }
