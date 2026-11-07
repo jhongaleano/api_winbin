@@ -66,6 +66,7 @@ public class Security {
                     .requestMatchers(HttpMethod.PATCH, "/api/usuarios/avatar").authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/usuarios/perfil/cambiar-password").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/usuarios/perfil").authenticated()
+                    .requestMatchers("/api/arduino/**").hasRole("PUENTE")
                     
                     .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ESTUDIANTE", "ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")

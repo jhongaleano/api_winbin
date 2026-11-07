@@ -18,6 +18,9 @@ import tareas.demo.repository.CategoriaPuntajeRepository;
 import tareas.demo.repository.DetalleSessionRepository;
 import tareas.demo.repository.MaterialRepository;
 import tareas.demo.repository.RegistroIaRepository;
+import tareas.demo.services.ArduinoService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/registroia")
@@ -28,17 +31,21 @@ public class RegistroIAController {
     private final DetalleSessionRepository sessionRepository;
     private final MaterialRepository materialRepository;
     private final CategoriaPuntajeRepository categoriaRepository;
+    private  final ArduinoService arduinoService;
 
     public RegistroIAController(
             RegistroIaRepository repository,
             DetalleSessionRepository sessionRepository,
             MaterialRepository materialRepository,
-            CategoriaPuntajeRepository categoriaRepository) {
+            CategoriaPuntajeRepository categoriaRepository,
+            ArduinoService arduinoService) {
         this.repositorio = repository;
         this.sessionRepository = sessionRepository;
         this.materialRepository = materialRepository;
         this.categoriaRepository = categoriaRepository;
+        this.arduinoService = arduinoService;
     }
+
 
     @Operation(
             summary = "Listar registros de IA (paginado)",
@@ -92,7 +99,18 @@ public class RegistroIAController {
         nuevoRegistro.setMaterial(mat);
         nuevoRegistro.setCategoria(cat);
 
-        return ResponseEntity.ok(repositorio.save(nuevoRegistro));
+        RegistroIa guardado = repositorio.save(nuevoRegistro);
+
+       
+        
+        try {
+            arduinoService.enviarMaterial(nuevoRegistro.getIdMaterial());
+        } catch (Exception e) {
+            log.warn("No se pudo encolar la orden del Arduino (material {}): {}",
+                mat.getIdMaterial(), e.getMessage());
+        }
+
+        return ResponseEntity.ok(guardado);
     }
 
     @Operation(summary = "Eliminar registro de IA", description = "Solo ADMIN + JWT.",

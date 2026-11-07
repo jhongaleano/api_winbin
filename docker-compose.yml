@@ -1,0 +1,66 @@
+services:
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8080:8080"
+    networks:
+      - red-interna
+
+  nginx-proxy:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '81:81'
+    volumes:
+      - ./data/nginx:/data
+      - ./data/letsencrypt:/etc/letsencrypt
+    networks:
+      - red-interna
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    cap_add:
+      - NET_RAW
+    volumes:
+      - ./data/kuma:/app/data
+    ports:
+      - "3001:3001" # Opcional para producción
+    networks:
+      - red-interna
+
+  api-backend:
+    build:
+      context: .
+    container_name: api-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8081:8080"
+    networks:
+      - red-interna
+
+
+  api-python:
+    image: cristhianpa22/api-python-winbin:latest
+    container_name: api-python
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    networks:
+      - red-interna
+
+networks:
+  red-interna:
+    driver: bridge
