@@ -54,33 +54,29 @@ public class RegistroIAController {
     )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<RegistroIa> listar(Pageable pageable) {
+    public Page<RegistroIa> listar(@PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
         return repositorio.findAll(pageable);
     }
 
-    @Operation(
-            summary = "Guardar resultado de la IA",
-            description = """
-                    Recibe el resultado de clasificación desde **Python**, Flutter o cualquier cliente autenticado.
+    @Operation(summary = "Guardar resultado de la IA", description = """
+            Recibe el resultado de clasificación desde **Python**, Flutter o cualquier cliente autenticado.
 
-                    **Campos obligatorios:** `idSession`, `idMaterial`, `idCategoria`.
+            **Campos obligatorios:** `idSession`, `idMaterial`, `idCategoria`.
 
-                    **Ejemplo body:**
-                    ```json
-                    {
-                      "idSession": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-                      "idMaterial": 1,
-                      "idCategoria": 2,
-                      "confianza": 0.95,
-                      "utlImagen": "https://storage.ejemplo.com/foto.jpg"
-                    }
-                    ```
+            **Ejemplo body:**
+            ```json
+            {
+              "idSession": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "idMaterial": 1,
+              "idCategoria": 2,
+              "confianza": 0.95,
+              "utlImagen": "https://storage.ejemplo.com/foto.jpg"
+            }
+            ```
 
-                    Reutiliza el **mismo** `idSession` para múltiples capturas en una ronda.
-                    Requiere JWT (cualquier rol autenticado).
-                    """,
-            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH)
-    )
+            Reutiliza el **mismo** `idSession` para múltiples capturas en una ronda.
+            Requiere JWT (cualquier rol autenticado).
+            """, security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @PostMapping("/guardar-resultado")
     public ResponseEntity<?> guardarDesdePython(@RequestBody RegistroIa nuevoRegistro) {
         if (nuevoRegistro.getIdSession() == null || nuevoRegistro.getIdMaterial() == null) {
@@ -113,8 +109,7 @@ public class RegistroIAController {
         return ResponseEntity.ok(guardado);
     }
 
-    @Operation(summary = "Eliminar registro de IA", description = "Solo ADMIN + JWT.",
-            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
+    @Operation(summary = "Eliminar registro de IA", description = "Solo ADMIN + JWT.", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(
             @Parameter(description = "ID del registro IA") @PathVariable Long id) {
@@ -125,26 +120,15 @@ public class RegistroIAController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Actualizar registro de IA", description = "Solo ADMIN + JWT.", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @PatchMapping("/{id}")
-    public ResponseEntity<RegistroIa> actualizar(@PathVariable Long id, @RequestBody RegistroIa cambios) {
-        return repositorio.findById(id).map(existente -> {
-            if(cambios.getConfianza() != null){
-            existente.setConfianza(cambios.getConfianza());
-            }
-            if(cambios.getUtlImagen() != null){
-            existente.setUtlImagen(cambios.getUtlImagen());
-            }
-            if(cambios.getIdSession() != null){
-            existente.setIdSession(cambios.getIdSession());
-            }
-            if(cambios.getMaterial() != null){
-            existente.setMaterial(cambios.getMaterial());
-            }
-            if(cambios.getCategoria() != null){
-                existente.setCategoria(cambios.getCategoria());
-            }
-            RegistroIa actualizado = repositorio.save(existente);
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody RegistroIa cambios) {
+        try {
+            // El controlador solo delega el trabajo al servicio
+            RegistroIa actualizado = registroIaService.actualizarResultadoIA(id, cambios);
             return ResponseEntity.ok(actualizado);
-        }).orElse(ResponseEntity.notFound().build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

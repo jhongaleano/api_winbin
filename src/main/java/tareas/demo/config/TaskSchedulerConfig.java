@@ -13,25 +13,33 @@ import tareas.demo.services.CierrePeriodoService;
 @Component
 public class TaskSchedulerConfig {
 
-    
     private final PeriodoRankingRepository periodoRepository;
     private final CierrePeriodoService cierrePeriodoService;
 
-    public TaskSchedulerConfig(PeriodoRankingRepository periodoRepository, CierrePeriodoService cierrePeriodoService){
+    public TaskSchedulerConfig(PeriodoRankingRepository periodoRepository, CierrePeriodoService cierrePeriodoService) {
         this.periodoRepository = periodoRepository;
         this.cierrePeriodoService = cierrePeriodoService;
     }
-    
-    @Scheduled(cron = "0 0 0 * * ?")
+
+    @Scheduled(cron = "0 0 0 * * ?" , zone = "America/Bogota")
     public void verificarYProcesarFinDePeriodo() {
         PeriodoRanking periodoActivo = periodoRepository.findByActivoTrue().orElse(null);
 
         if (periodoActivo != null && LocalDate.now().isAfter(periodoActivo.getFechaFin())) {
-            
-            cierrePeriodoService.ejecutarCierreYReiniciarPuntos(periodoActivo);
+            try {
+                System.out.println("Iniciando cierre de periodo...");
 
-            periodoActivo.setActivo(false);
-            periodoRepository.save(periodoActivo);
+                cierrePeriodoService.ejecutarCierreYReiniciarPuntos(periodoActivo);
+
+                periodoActivo.setActivo(false);
+                periodoRepository.save(periodoActivo);
+
+                System.out.println("Periodo cerrado exitosamente.");
+
+            } catch (Exception e) {
+                System.err.println("Error al cerrar el periodo: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

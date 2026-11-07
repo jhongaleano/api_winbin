@@ -19,6 +19,7 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
     Optional<usuarios> findByDocumento(String documento);
 
     List<usuarios> findTop10ByOrderByPuntosDesc(Pageable pageable);
+    List<usuarios> findAllByOrderByPuntosDesc(Pageable pageable);
 
     @Query(value = "SELECT * FROM usuarios WHERE documento = :documento", nativeQuery = true)
     Optional<usuarios> findByDocumentoIncluyendoInactivos(@Param("documento") String documento);
@@ -31,7 +32,7 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
 
 
     @Modifying
-    @Query("UPDATE usuarios u SET u.puntos = 0 WHERE u.activo = true")
+    @Query("UPDATE usuarios u SET u.puntos = 0" )
     void reiniciarPuntosUsuarios();
 
     void deleteById(String documento);

@@ -14,7 +14,10 @@ import tareas.demo.dto.CambiarPasswordDTO;
 import tareas.demo.dto.UsuarioRegistroDTO;
 import tareas.demo.models.usuarios;
 import tareas.demo.repository.UsuarioRepository;
+import tareas.demo.repository.CursoRepository;
+import tareas.demo.services.CursosService;
 import tareas.demo.services.UsuarioService;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 
 @RestController
@@ -22,12 +25,22 @@ import tareas.demo.services.UsuarioService;
 @Tag(name = "Usuarios", description = "Gestión de usuarios, perfiles, roles, avatares y contraseñas")
 public class usuarioController {
 
+    private final CursosService cursosService;
+
+    private final CursoRepository cursoRepository;
+
     private final UsuarioRepository repositorio;
     private final UsuarioService usuarioService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService) {
+    public usuarioController(UsuarioRepository repositorio, UsuarioService usuarioService, CursoRepository cursoRepository, CursosService cursosService, SimpMessagingTemplate messagingTemplate) {
         this.repositorio = repositorio;
         this.usuarioService = usuarioService;
+        this.cursoRepository = cursoRepository;
+        this.cursosService = cursosService;
+        this.messagingTemplate = messagingTemplate;
+        
+
     }
 
     @Operation(summary = "Listar usuarios activos", description = "Retorna todos los usuarios con `activo = true`. Requiere JWT (USER/ESTUDIANTE/ADMIN).",
@@ -116,7 +129,7 @@ public class usuarioController {
         }
     }
 
-    @Operation(summary = "Actualizar usuario", description = "Actualiza nombre y curso. Solo ADMIN + JWT.",
+    @Operation(summary = "Actualizar usuario", description = "Actualiza nombre y curso o puntos . Solo ADMIN + JWT.",
             security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
     @PutMapping("/{documento}")
     public ResponseEntity<?> actualizar(
@@ -128,12 +141,23 @@ public class usuarioController {
                         if (usuarioActualizado.getNombre() != null) {
                             usuario.setNombre(usuarioActualizado.getNombre());
                         }
-                        if (usuarioActualizado.getCurso() != null) {
-                            usuario.setCurso(usuarioActualizado.getCurso());
+                        if (usuarioActualizado.getPuntos() != null) {
+                            usuario.setPuntos(usuarioActualizado.getPuntos());
                         }
-                        return repositorio.save(usuario);
+                        if (usuarioActualizado.getCurso() != null && usuarioActualizado.getCurso().getId_curso() != null) {
+                            Integer idCurso = usuarioActualizado.getCurso().getId_curso();
+                            cursoRepository.findById(idCurso).ifPresent(cursoCompleto -> {
+                            usuario.setCurso(cursoCompleto);
+                            });
+                        }
+                       
+                        return repositorio.saveAndFlush(usuario);
                     })
                     .orElseThrow(() -> new RuntimeException("El usuario con documento " + documento + " no existe"));
+                    System.out.println(" [DEBUG CONTROLLER] Usuario actualizado correctamente. ¡Disparando WebSockets!");
+            messagingTemplate.convertAndSend("/topic/ranking/estudiante-top", "{\"nombre\": \"TEST WEBSOCKET\", \"puntos\": 9999}");
+            usuarioService.notificarRankingsUsuariosWebsocket();
+            cursosService.notificarRankingsCursosWebsocket();
             return ResponseEntity.ok(usuarioModificado);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al actualizar: " + e.getMessage());

@@ -2,6 +2,7 @@ package tareas.demo.services;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,14 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final CursoRepository cursoRepository;
+    private final SimpMessagingTemplate messagingTemplate;
     
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, CursoRepository cursoRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, CursoRepository cursoRepository, SimpMessagingTemplate messagingTemplate) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.cursoRepository = cursoRepository; 
+        this.messagingTemplate = messagingTemplate;
     }
 
     public usuarios guardarUsuario(UsuarioRegistroDTO registroDTO) {
@@ -74,10 +77,17 @@ public class UsuarioService {
         List<usuarios> resultado = usuarioRepository.findTop10ByOrderByPuntosDesc(topUno);
         return resultado.isEmpty() ? null : resultado.get(0);
     }
+    
+    public void notificarRankingsUsuariosWebsocket() {
+        System.out.println("¡Disparando WebSocket de Usuarios desde Java!");
+        messagingTemplate.convertAndSend("/topic/ranking/estudiantes-top10", obtenerTop10Estudiantes());
+        messagingTemplate.convertAndSend("/topic/ranking/estudiante-top", obtenerUsuarioTOP());
+        System.out.println(" [DEBUG WEBSOCKET] Mensajes de usuario enviados por STOMP al canal /topic/...");
+    }
 
-    public List<usuarios> obtenerSiguientes10Estudiantes() {
-        Pageable siguientesDiez = PageRequest.of(1, 10);
-        return usuarioRepository.findTop10ByOrderByPuntosDesc(siguientesDiez);
+    public List<usuarios> obtenerUsuariosPaginados(int page) {
+        Pageable pagina = PageRequest.of(page, 10);
+        return usuarioRepository.findTop10ByOrderByPuntosDesc(pagina);
     }
 
     public usuarios cambiarRolUsuario(String documento, String nuevoRol) {

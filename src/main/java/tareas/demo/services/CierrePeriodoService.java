@@ -1,6 +1,5 @@
 package tareas.demo.services;
 
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,30 +22,29 @@ import tareas.demo.repository.UsuarioRepository;
 public class CierrePeriodoService {
 
     private final UsuarioRepository usuarioRepository;
-
     private final CursoRepository cursoRepository;
-    private HistorialGanadoresRepository historialRepository;
+    private final HistorialGanadoresRepository historialRepository;
 
-    public CierrePeriodoService(UsuarioRepository usuarioRepository, CursoRepository cursoRepository, HistorialGanadoresRepository historialRepository){
+    public CierrePeriodoService(UsuarioRepository usuarioRepository, CursoRepository cursoRepository,
+            HistorialGanadoresRepository historialRepository) {
         this.usuarioRepository = usuarioRepository;
         this.cursoRepository = cursoRepository;
         this.historialRepository = historialRepository;
     }
-
 
     @Transactional
     public void ejecutarCierreYReiniciarPuntos(PeriodoRanking periodoActual) {
         Pageable topDiez = PageRequest.of(0, 10);
         List<HistorialGanadores> historialAGuardar = new ArrayList<>();
 
-        List<usuarios> topUsuarios = usuarioRepository.findTop10ByOrderByPuntosDesc(topDiez);
+        List<usuarios> topUsuarios = usuarioRepository.findAllByOrderByPuntosDesc(topDiez);
         for (int i = 0; i < topUsuarios.size(); i++) {
             usuarios u = topUsuarios.get(i);
 
             HistorialGanadores h = new HistorialGanadores();
-            h.setPuesto(i + 1); 
-            h.setTipoPremio(tipoPremio.INDIVIDUAL);
-            h.setPuntosLogrados(u.getPuntos()); 
+            h.setPuesto(i + 1);
+            h.setTipoPremio(tipoPremio.individual);
+            h.setPuntosLogrados(u.getPuntos());
             h.setFecha(LocalDate.now());
             h.setDocumento(u);
             h.setId_curso(u.getCurso());
@@ -62,7 +60,7 @@ public class CierrePeriodoService {
 
             HistorialGanadores h = new HistorialGanadores();
             h.setPuesto(i + 1);
-            h.setTipoPremio(tipoPremio.CURSO);
+            h.setTipoPremio(tipoPremio.curso);
             h.setPuntosLogrados(c.getPuntosTotales());
             h.setFecha(LocalDate.now());
             h.setDocumento(null);

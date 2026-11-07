@@ -20,7 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         
         String jsonError = String.format(
-            "{\"error\":\"No autorizado\", \"mensaje\":\"Debes iniciar sesión para acceder a este recurso\"}");
+            "{\"error\":\"No autorizado\", \"mensaje\":\"Debes iniciar sesión para acceder a este recurso\",\"status\":%d}");
         
         response.getWriter().write(jsonError);
     }
