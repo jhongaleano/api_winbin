@@ -18,25 +18,40 @@ import tareas.demo.repository.CategoriaPuntajeRepository;
 import tareas.demo.repository.DetalleSessionRepository;
 import tareas.demo.repository.MaterialRepository;
 import tareas.demo.repository.RegistroIaRepository;
-import tareas.demo.services.RegistroIaService;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
+import tareas.demo.services.ArduinoService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/registroia")
 @Tag(name = "Registro IA", description = "Resultados de clasificación del servicio de inteligencia artificial")
 public class RegistroIAController {
 
-    private final RegistroIaService registroIaService ;
-    private final RegistroIaRepository repositorio ;
+    private final RegistroIaRepository repositorio;
+    private final DetalleSessionRepository sessionRepository;
+    private final MaterialRepository materialRepository;
+    private final CategoriaPuntajeRepository categoriaRepository;
+    private  final ArduinoService arduinoService;
 
-    public RegistroIAController(RegistroIaRepository repositorio, RegistroIaService registroIaService) {
-        this.repositorio = repositorio;
-        this.registroIaService = registroIaService;
+    public RegistroIAController(
+            RegistroIaRepository repository,
+            DetalleSessionRepository sessionRepository,
+            MaterialRepository materialRepository,
+            CategoriaPuntajeRepository categoriaRepository,
+            ArduinoService arduinoService) {
+        this.repositorio = repository;
+        this.sessionRepository = sessionRepository;
+        this.materialRepository = materialRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.arduinoService = arduinoService;
     }
 
-    @Operation(summary = "Listar registros de IA", description = "Solo ADMIN. Parámetros: `?page=0&size=20&sort=idIa,desc`", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
+
+    @Operation(
+            summary = "Listar registros de IA (paginado)",
+            description = "Solo ADMIN. Parámetros: `?page=0&size=20&sort=idIa,desc`",
+            security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH)
+    )
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Page<RegistroIa> listar(@PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
@@ -67,12 +82,31 @@ public class RegistroIAController {
         if (nuevoRegistro.getIdSession() == null || nuevoRegistro.getIdMaterial() == null) {
             return ResponseEntity.badRequest().body("Faltan IDs requeridos");
         }
+        DetalleSession sesion = sessionRepository.findById(nuevoRegistro.getIdSession())
+                .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
+        Material mat = materialRepository.findById(nuevoRegistro.getIdMaterial())
+                .orElseThrow(() -> new RuntimeException("Material no encontrado"));
+
+        CategoriaPuntaje cat = categoriaRepository.findById(nuevoRegistro.getIdCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        nuevoRegistro.setSession(sesion);
+        nuevoRegistro.setMaterial(mat);
+        nuevoRegistro.setCategoria(cat);
+
+        RegistroIa guardado = repositorio.save(nuevoRegistro);
+
+       
+        
         try {
-            RegistroIa guardado = registroIaService.guardarResultadoIA(nuevoRegistro);
-            return ResponseEntity.ok(guardado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            arduinoService.enviarMaterial(nuevoRegistro.getIdMaterial());
+        } catch (Exception e) {
+            log.warn("No se pudo encolar la orden del Arduino (material {}): {}",
+                mat.getIdMaterial(), e.getMessage());
         }
+
+        return ResponseEntity.ok(guardado);
     }
 
     @Operation(summary = "Eliminar registro de IA", description = "Solo ADMIN + JWT.", security = @SecurityRequirement(name = OpenApiConstants.BEARER_AUTH))
