@@ -34,7 +34,7 @@ public class DashboardService {
     public DashboardResumenDTO obtenerResumenCompleto() {
         try {
             long totalUsuarios = usuarioRepository.count();
-            long usuariosInactivos = usuarioRepository.contarUsuariosInactivos();
+            long usuariosInactivos = usuarioRepository.countByActivoFalse();
             long totalCursos = cursoRepository.count();
             long totalMateriales = materialRepository.count();
             long puntosTotales = usuarioRepository.sumarPuntosTodosLosUsuarios();

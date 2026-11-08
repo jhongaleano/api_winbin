@@ -30,7 +30,7 @@ public class CursosService {
         return cursoRepository.findByOrderByPuntosTotalesDesc(topDiez);
     }
 
-    public Cursos obtenerCursoTop() {
+    public Cursos   obtenerCursoTop() {
 
         Pageable top = PageRequest.of(0, 1);
         List<Cursos> resultado = cursoRepository.findByOrderByPuntosTotalesDesc(top);
@@ -45,5 +45,6 @@ public class CursosService {
         System.out.println(" ¡Disparando WebSocket de Cursos desde Java!");
         messagingTemplate.convertAndSend("/topic/ranking/cursos-top10", obtenerTop10Cursos());
         messagingTemplate.convertAndSend("/topic/ranking/curso-top", obtenerCursoTop());
+
     }
 }
