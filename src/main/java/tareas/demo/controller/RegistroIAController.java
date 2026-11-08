@@ -19,6 +19,8 @@ import tareas.demo.repository.DetalleSessionRepository;
 import tareas.demo.repository.MaterialRepository;
 import tareas.demo.repository.RegistroIaRepository;
 import tareas.demo.services.ArduinoService;
+import org.springframework.data.web.PageableDefault;
+import  tareas.demo.services.RegistroIaService;
 
 import java.util.Map;
 
@@ -32,18 +34,21 @@ public class RegistroIAController {
     private final MaterialRepository materialRepository;
     private final CategoriaPuntajeRepository categoriaRepository;
     private  final ArduinoService arduinoService;
+    private  final RegistroIaService registroIaService;
 
     public RegistroIAController(
             RegistroIaRepository repository,
             DetalleSessionRepository sessionRepository,
             MaterialRepository materialRepository,
             CategoriaPuntajeRepository categoriaRepository,
-            ArduinoService arduinoService) {
+            ArduinoService arduinoService,
+            RegistroIaService registroIaService) {
         this.repositorio = repository;
         this.sessionRepository = sessionRepository;
         this.materialRepository = materialRepository;
         this.categoriaRepository = categoriaRepository;
         this.arduinoService = arduinoService;
+        this.registroIaService = registroIaService;
     }
 
 
@@ -102,8 +107,7 @@ public class RegistroIAController {
         try {
             arduinoService.enviarMaterial(nuevoRegistro.getIdMaterial());
         } catch (Exception e) {
-            log.warn("No se pudo encolar la orden del Arduino (material {}): {}",
-                mat.getIdMaterial(), e.getMessage());
+            System.err.println("Error enviando al Arduino: \" + e.getMessage()");
         }
 
         return ResponseEntity.ok(guardado);
@@ -124,7 +128,6 @@ public class RegistroIAController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody RegistroIa cambios) {
         try {
-            // El controlador solo delega el trabajo al servicio
             RegistroIa actualizado = registroIaService.actualizarResultadoIA(id, cambios);
             return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {

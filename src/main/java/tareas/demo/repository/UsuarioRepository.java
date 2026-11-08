@@ -30,7 +30,6 @@ public interface UsuarioRepository extends JpaRepository<usuarios, String> {
     @Query(value = "SELECT * FROM usuarios", nativeQuery = true)
     List<usuarios> findAllIncluyendoInactivos();
 
-
     @Modifying
     @Query("UPDATE usuarios u SET u.puntos = 0" )
     void reiniciarPuntosUsuarios();
