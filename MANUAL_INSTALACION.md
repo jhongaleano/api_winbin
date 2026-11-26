@@ -1,31 +1,99 @@
-manual_de_instalaci_n.md
-100%
-# 🛠️ Manual de Instalación y Despliegue
+# WINBIN | Manual de Instalación y Técnico
+----
+## Descripción del Proyecto
+Este documento describe el proceso de despliegue de la API de winbin, configurada con Springboot y Docker
 
-## 1. Descripción del Proyecto
-Este documento describe el proceso completo de instalación, configuración y despliegue de la API, así como los puertos asignados, los accesos a los paneles de administración y los comandos de operación diaria.
+---
 
-## 2. Arquitectura del Sistema
-| Servicio | Descripción | Contenedor |
-|---|---|---|
-| **API Backend** | Spring Boot (Java) | `api-backend` |
-| **API Python** | Servicio complementario | `api-python` |
-| **Nginx Proxy Manager** | Proxy inverso y certificados SSL | `nginx-proxy` |
-| **Uptime Kuma** | Monitoreo de disponibilidad | `uptime-kuma` |
-| **Dozzle** | Visor de logs de contenedores | `dozzle` |
+### Arquitectura del Sistema
 
-Todos los servicios comparten la red interna `red-interna`, por lo que se comunican entre sí usando el nombre del contenedor (por ejemplo `http://api-backend:8080`).
+El ecosistema funciona bajo una arquitectura desacoplada basada en microservicios y clientes multiplataforma:
 
+* **Backend Transaccional (api_winbin):** API REST desarrollada en: **Java + Spring Boot**, encargada de la lógica de negocio, autenticación JWT, gestión de puntos, rankings por periodo, auditoría y comunicación serial con el hardware.
+  
+* **Microservicio de Visión Artificial (winbin-ia):** Servicio asíncrono en **Python + FastAPI** integrado con **Groq API** y **Cloudinary** para identificar material (plástico/cartón), tamaño (pequeño, mediano, grande) y filtrar residuos no admitidos.
+  
+* **Base de Datos Relacional:** **MySQL** (alojada en Aiven Cloud), normalizada en Tercera Forma Normal (3FN) con 9 tablas **(usuarios, cursos, materiales, categoriaPuntaje, periodoRanking, detalleSession, registroIA, historialGanadores, auditoria)**.
 
-## 3. Prerrequisitos de Software
-Antes de iniciar, asegúrese de tener instalado:
-* **Docker Engine** (v20.10 o superior)
-* **Java**
-* **Git**
-* **MySQL** accesible desde el contenedor (local, XAMPP o remoto)
-* Sistema operativo: Linux (Ubuntu 22.04 o similar), o Windows 11 con WSL2 y Docker Desktop
+* **Clientes Multiplataforma (front_winbin / frontend_winbin_maquina):** Desarrollados en **Flutter / Dart** (interfaz táctil, aplicación móvil de estudiantes y WinBin Panel web para administradores).
+  
+* **Control Físico (IoT / Hardware):** Microcontrolador **Arduino Uno** conectado vía USB serial (jSerialComm) que acciona servomotores **MG995** para la apertura automática de compuertas.
 
-## 4. Asignación de Puertos
+## Stack Tecnológico
+
+| **Capa** | **Tecnologías** |
+| :--- | :--- |
+| **Backend Core** | Java 17+, Spring Boot, Spring Security (JWT), JPA/Hibernate, jSerialComm |
+| **Microservicio IA** | Python 3.11+, FastAPI, Uvicorn, Groq Vision API, Cloudinary SDK |
+| **Frontend** | Flutter, Dart, Material 3 |
+| **Base de Datos** | MySQL 8.0 (Aiven Cloud) |
+| **Hardware** | Arduino Uno, Servomotores MG995, Cámara USB |
+| **DevOps & Monitoreo** | Docker, Docker Compose, Nginx Proxy Manager, AWS EC2, Render, Uptime Kuma, Dozzle |
+
+## Prequisitos Previos
+
+* **Java JDK 17** o superior y **Maven 3.8+**
+* **Python 3.10+** (para el microservicio de IA)
+* **Flutter SDK 3.x** (para compilar los clientes web/móvil/kiosco)
+* **Docker y Docker Compose** (opcional para despliegue contenedorizado)
+* **Arduino IDE** y placa **Arduino Uno** conectada por puerto USB (/dev/ttyACM0 en Linux o COMx en Windows)
+
+---
+## Pasos de Insralación Frontend
+
+#### Paso 1: Clonar el repositorio
+
+```bash
+git clone https://github.com/sofisdevops/WinBin.git
+
+```
+
+#### Paso 2: Abrir la carpeta del proyecto
+
+```bash
+cd winbin
+```
+
+#### Paso 3: Abrir la carpeta en un editor de código
+
+```bash
+code .
+```
+
+#### Paso 4: Instalar dependencias
+
+```bash
+flutter pub get
+```
+
+#### Paso 5: Correr el proyecto
+
+* Ejecutar desde chrome:
+```bash
+flutter run -d chrome
+```
+
+* Ejecutar desde edge:
+```bash
+flutter run -d edge
+```
+
+* Si tienes un emulador abierto o un telefono por USB:
+```bash
+flutter run
+```
+## 5. Verificación de Despliegue
+
+* Si tienes varios conectados, primero verifica el ID de tus dispositivos y luego corres su ID
+```bash
+flutter devices
+flutter run -d <ID_del_dispositivo>
+```
+---
+
+## Pasos de Instalación Backend
+
+## Asignación de Puertos
 
 Estos son los puertos que cada servicio publica en el servidor (formato `host:contenedor`):
 
@@ -49,14 +117,11 @@ Estos son los puertos que cada servicio publica en el servidor (formato `host:co
 * Los puertos **81, 3001 y 8080** exponen paneles de administración. En un servidor público, restrínjalos con firewall o acceda a ellos por Nginx Proxy Manager con autenticación.
 * Si el `docker-compose.yml` del repositorio no incluye la sección `ports`, agréguela a cada servicio como se muestra en el paso 5.
 
-## 5. Pasos de Instalación
-
-
 
 #### Paso 1: Clonar el repositorio
 
 ```bash
-git clone [https://github.com/jhongaleano/api_winbin.git]
+git clone https://github.com/jhongaleano/api_winbin.git
 ```
 
 #### Paso 2: Abrir la carpeta del proyecto
@@ -72,12 +137,12 @@ code .
 ```
 
 #### Paso 4: Configuración de Variables de Entorno (Si aplica)
-Copie el archivo de ejemplo y configure las variables necesarias:
+
+En el cofigo se encuentra un archivo .env de ejemplo, copie el archivo y configure las variables necesarias. No olvides modificar el nombre del archivo **".env.example"** a **".env**
+
 ```bash
 cp .env.example .env
-# Edite el archivo .env con su editor de texto (nano, vim, etc.) NO OLVIDES MODIFICAR EL NOMBRE DEL ARCHIVO de ".env.example" a ".env"
 ```
-
 #### Paso 5: Verificar `docker-compose.yml` (puertos)
 aignarle los puertos a cada servicio en su sección `ports`:
 ```yaml
