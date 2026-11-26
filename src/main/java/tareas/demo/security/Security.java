@@ -42,43 +42,44 @@ public class Security {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/v3/api-docs.yaml",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/api/ranking/top-usuario").permitAll()
-                        .requestMatchers("/api/ranking/top-curso").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/cursos").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios/registro").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/registroia/**").authenticated()
-                        .requestMatchers(HttpMethod.PATCH, "/api/usuarios/avatar").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/perfil/cambiar-password").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/usuarios/perfil").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/DetalleSession").authenticated()
-
-                        .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ESTUDIANTE", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/dashboard/**").hasAnyRole("ADMIN")
-                        .anyRequest().authenticated())
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedHandler(customAccessDeniedHandler))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/error").permitAll()
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    ).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
+                    .requestMatchers("/api/ranking/top-usuario").permitAll()
+                    .requestMatchers("/api/ranking/top-curso").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/cursos").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/usuarios/registro").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/registroia/**").authenticated()
+                    .requestMatchers(HttpMethod.PATCH, "/api/usuarios/avatar").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/api/usuarios/perfil/cambiar-password").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/usuarios/perfil").authenticated()
+                    .requestMatchers("/api/arduino/**").hasRole("PUENTE")
+                    
+                    .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ESTUDIANTE", "ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PATCH, "/api/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/dashboard/**").hasAnyRole( "ADMIN")
+                    .anyRequest().authenticated()
+            ).exceptionHandling(exception -> exception
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
+            ).sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -51,7 +51,9 @@ public class usuarios {
 
     public enum Rol {
         ESTUDIANTE,
-        ADMIN
+        ADMIN,
+        PUENTE
+
     }
 
     @PrePersist

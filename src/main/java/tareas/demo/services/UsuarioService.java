@@ -71,7 +71,6 @@ public class UsuarioService {
         return usuarioRepository.findTop10ByOrderByPuntosDesc(topDiez);
     }
 
-
     public usuarios obtenerUsuarioTOP() {
         Pageable topUno = PageRequest.of(0, 1);
         List<usuarios> resultado = usuarioRepository.findTop10ByOrderByPuntosDesc(topUno);

@@ -82,6 +82,7 @@ flutter run -d edge
 ```bash
 flutter run
 ```
+## 5. Verificación de Despliegue
 
 * Si tienes varios conectados, primero verifica el ID de tus dispositivos y luego corres su ID
 ```bash
