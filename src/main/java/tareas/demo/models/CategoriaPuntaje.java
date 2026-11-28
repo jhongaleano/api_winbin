@@ -27,7 +27,7 @@ public class CategoriaPuntaje{
     private Material id_material;
 }
 
-enum Tamano {
+ enum Tamano {
     pequeño,
     mediano,
     grande,
